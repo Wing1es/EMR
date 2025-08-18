@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Health App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a86d7;
+            --secondary-color: #28a745;
+            --danger-color: #EF4444;
+            --info-color: #6366F1; /* Color for Reminders */
+            --bg-light: #F3F4F6;
+            --bg-white: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-light: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ecf0f3;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6,
+                                -6px -6px 10px rgba(226, 226, 227, 0.5),
+                                inset 1px 1px 1px #d1d9e6,
+                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+            padding: 0 15px;
+            margin: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            
+            z-index: 100;
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #2d5a2f }
+        .nav-links { display: flex; }
+        .nav-links a { color: #000000; text-decoration: none; margin: 0 15px;border-radius: 10px; font-weight: 500; transition: color 0.2s ease;padding: 10px 15px ; }
+        .nav-links a:hover, .nav-links a.active { color: #2d5a2f;       background: linear-gradient(145deg, #c5f5c8, #f2fff3);
+         box-shadow:  4px 4px 6px #d1d9e6, -4px -4px 6px #fff;}
+        .user-menu { display: flex; align-items: center; gap: 15px; }
+        .logout-btn {
+            background: linear-gradient(135deg, #FF7043, #D84315);
+            color: white;
+            margin-right: -2px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+        }
+        .hamburger-menu { display: none; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--text-dark); }
+        .mobile-nav {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-white);
+            box-shadow: 0 10px 15px var(--shadow-color);
+            padding: 10px 20px;
+        }
+        .mobile-nav a { 
+            display: block; 
+            padding: 12px 0; 
+            text-align: center; 
+            color: var(--text-dark); 
+            text-decoration: none; 
+            font-weight: 500; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .mobile-nav .user-info { 
+            padding: 12px 0;
+            text-align: center;
+            color: var(--text-light); 
+            font-size: 0.9rem; 
+            border-bottom: 1px solid var(--border-color);
+        }
+        .mobile-nav a.mobile-logout {
+            color: var(--danger-color);
+            border-bottom: none; /* No border for the last item */
+        }
+        .main-content { padding: 40px;margin-top: 45px; }
+        .header { margin-bottom: 30px; }
+        .header h1 { font-size: 2.2rem; font-weight: 700;color: #3a86d7; }
+        .header p { color: var(--text-light); font-size: 1.1rem; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .card {
+           
+            border-radius: 16px;
+            padding: 25px;
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6,
+                                -6px -6px 10px rgba(226, 226, 227, 0.5),
+                                inset 1px 1px 1px #d1d9e6,
+                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+               background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6,
+                                -6px -6px 10px rgba(226, 226, 227, 0.5),
+                                inset 1px 1px 1px #d1d9e6,
+                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+        }
+        .card-col-span-3 { grid-column: span 3; }
+        .action-card { display: flex; flex-direction: column; justify-content: center; align-items: center; text-decoration: none; color: var(--text-dark); }
+        .action-card .icon { font-size: 3rem; margin-bottom: 15px; }
+        .action-card .icon.primary { color: var(--primary-color); }
+        .action-card .icon.secondary { color: #2d5a2f; }
+        .action-card .icon.info { color: #3a86d7; }
+        .action-card .title { font-size: 1.2rem; font-weight: 600; }
+        .action-card .subtitle { font-size: 0.9rem; color: var(--text-light); }
+        .stat-card .value { font-size: 2.5rem; font-weight: 700; }
+        .stat-card .label { color: var(--text-light); }
+        .stat-card .value.danger { color: var(--danger-color); }
+        .ai-card .title { font-size: 1.5rem; font-weight: 600; margin-bottom: 20px; }
+        .ai-card textarea { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); resize: vertical; font-family: 'Poppins', sans-serif; background-color: #f9fafb; }
+        .ai-actions { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 20px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background-color: var(--primary-color); color: white;padding: 14px 36px;border: none;border-radius: 10px;font-family: poppins;font-weight: 700;transition: transform .3s ease; }
+        .btn-primary:hover{transform: translateY(-2px);box-shadow: 0 4px 10px rgba(0,0,0,0.3); filter: brightness(1.1);}
+        .btn-secondary { background-color: var(--secondary-color); color: white; transition: transform .3s ease;}
+        .btn-secondary:hover{transform: translateY(-2px);box-shadow: 0 4px 10px rgba(0,0,0,0.3); filter: brightness(1.1);}
+        #result-container { margin-top: 25px; padding: 20px; background-color: white; border-radius: 8px; }
+        #result-text h3, #result-text h4 { font-size: 1.1rem; font-weight: 600; color: var(--primary-color); margin-top: 1rem; }
+        #result-text ul { list-style-type: disc; padding-left: 20px; margin-bottom: 1rem; }
+        .hidden { display: none; }
+        @media (max-width: 1200px) {
+           
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+            .card-col-span-3 { grid-column: span 2; }
+        }
+        @media (max-width: 992px) {
+            .nav-links, .user-menu { display: none; }
+            .hamburger-menu { display: block; }
+        }
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .card-col-span-2, .card-col-span-3 { grid-column: span 1; }
+            .top-nav { padding: 0 20px; }
+            .main-content { padding: 20px;margin-top: 50px; }
+            .ai-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn {
+                text-align: center;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-nav">
+        <div class="logo"><i class="fas fa-heart-pulse"></i> HealthApp</div>
+        <nav class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+            <a href="{{ url_for('records') }}">Records</a>
+            <a href="{{ url_for('overview') }}">Overview</a>
+            <a href="{{ url_for('view_reminders') }}">Reminders</a>
+            {% if user_role == 'admin' %}
+            <a href="{{ url_for('create_user') }}">Create User</a>
+            <a href="{{ url_for('view_audit_logs') }}">Audit Logs</a>
+            {% endif %}
+        </nav>
+        <div class="user-menu">
+            <span>{{ username }} ({{ user_role }})</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+        <button class="hamburger-menu" id="hamburger-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+    
+    <nav class="mobile-nav" id="mobile-nav-menu">
+        <div class="user-info">{{ username }} ({{ user_role }})</div>
+        <a href="{{ url_for('dashboard') }}" class="active">Dashboard</a>
+        <a href="{{ url_for('records') }}">Records</a>
+        <a href="{{ url_for('overview') }}">Overview</a>
+        <a href="{{ url_for('view_reminders') }}">Reminders</a>
+        {% if user_role == 'admin' %}
+        <a href="{{ url_for('create_user') }}">Create User</a>
+        <a href="{{ url_for('view_audit_logs') }}">Audit Logs</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="mobile-logout">Logout</a>
+    </nav>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <p>Welcome back! Here's a quick overview of your application.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Quick Action Cards -->
+            <a href="{{ url_for('patient_entry') }}" class="card action-card">
+                <i class="fas fa-user-plus icon primary"></i>
+                <div class="title">Add New Patient</div>
+                <div class="subtitle">Register a new patient's vitals</div>
+            </a>
+            <a href="{{ url_for('records') }}" class="card action-card">
+                <i class="fas fa-book-medical icon secondary"></i>
+                <div class="title">View All Records</div>
+                <div class="subtitle">Search, edit, and manage patients</div>
+            </a>
+            <a href="{{ url_for('set_reminder') }}" class="card action-card">
+                <i class="fas fa-clock icon info"></i>
+                <div class="title">Set a Reminder</div>
+                <div class="subtitle">Schedule a medication reminder</div>
+            </a>
+
+            <!-- Stat Cards -->
+            <div class="card stat-card">
+                <div class="value">{{ stats.total_patients }}</div>
+                <div class="label">Total Patients Registered</div>
+            </div>
+            <div class="card stat-card">
+                <div class="value danger">{{ stats.abnormal_vitals_count }}</div>
+                <div class="label">Patients with Abnormal Vitals</div>
+            </div>
+
+            <!-- AI Detector -->
+            <div class="card ai-card card-col-span-3">
+                <h2 class="title"><i class="fas fa-robot"></i> Health Assistant</h2>
+                <form id="condition-form">
+                    <textarea id="condition-text" name="text" rows="5" placeholder="Enter a description of symptoms..."></textarea>
+                    <div class="ai-actions">
+                        <label for="image-upload" class="btn btn-secondary"><i class="fas fa-upload"></i> Upload Image</label>
+                        <input type="file" id="image-upload" name="image" class="hidden" accept="image/png, image/jpeg">
+                        <button type="submit" id="detect-button" class=" btn-primary">
+                            <span id="button-icon-container"><i class="fas fa-search"></i></span>
+                            <span id="button-text">Analyze</span>
+                        </button>
+                    </div>
+                    <p id="file-name-display" class="text-center text-sm text-gray-500 mt-3"></p>
+                </form>
+                <div id="result-container" style="display: none;">
+                    <h3 class="text-xl font-semibold mb-3">Analysis Results:</h3>
+                    <div id="result-text"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Hamburger Menu Logic ---
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const mobileNavMenu = document.getElementById('mobile-nav-menu');
+
+        hamburgerBtn.addEventListener('click', function() {
+            const isVisible = mobileNavMenu.style.display === 'block';
+            mobileNavMenu.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // --- AI Detector Logic ---
+        const conditionForm = document.getElementById('condition-form');
+        const imageUploadInput = document.getElementById('image-upload');
+        const fileNameDisplay = document.getElementById('file-name-display');
+
+        imageUploadInput.addEventListener('change', function() {
+            fileNameDisplay.textContent = this.files[0] ? this.files[0].name : '';
+        });
+
+        if (conditionForm) {
+            conditionForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const detectButton = document.getElementById('detect-button');
+                const buttonText = document.getElementById('button-text');
+                const buttonIconContainer = document.getElementById('button-icon-container');
+                const resultContainer = document.getElementById('result-container');
+                const resultText = document.getElementById('result-text');
+                
+                const formData = new FormData(conditionForm);
+                const imageFile = formData.get('image');
+
+                if (!formData.get('text').trim() && (!imageFile || imageFile.size === 0)) {
+                    alert('Please enter some text or upload an image to analyze.');
+                    return;
+                }
+
+                const originalIconHTML = buttonIconContainer.innerHTML;
+                const loadingIconHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                
+                resultContainer.style.display = 'none';
+                resultText.classList.remove('text-red-600');
+                detectButton.disabled = true;
+                buttonText.innerText = 'Analyzing...';
+                buttonIconContainer.innerHTML = loadingIconHTML;
+
+                try {
+                    const response = await fetch('/detect', {
+                        method: 'POST',
+                        body: formData,
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        resultText.textContent = `Error: ${data.error || 'An unknown error occurred.'}`;
+                        resultText.classList.add('text-red-600');
+                    } else {
+                        resultText.innerHTML = data.conditions; 
+                    }
+                    resultContainer.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Analysis fetch error:', error);
+                    resultContainer.style.display = 'block';
+                    resultText.textContent = 'Error: Could not connect to the server. Please try again later.';
+                    resultText.classList.add('text-red-600');
+                } finally {
+                    detectButton.disabled = false;
+                    buttonText.innerText = 'Analyze';
+                    buttonIconContainer.innerHTML = originalIconHTML;
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{# This file is included in dashboard.html and records.html #}
+<div id="settingsSidebar" class="sidebar">
+    <div class="sidebar-header">
+        <h3>⚙️ Settings</h3>
+        <button class="close-sidebar-btn" onclick="closeSettingsSidebar()">&times;</button>
+    </div>
+
+    <div class="sidebar-nav">
+        <a href="#" id="aboutLink" onclick="showSettingsSection('about'); return false;">About</a>
+        <a href="#" id="accountLink" onclick="showSettingsSection('account'); return false;">Account</a>
+    </div>
+
+    <div class="sidebar-content">
+        {# About Section #}
+        <div id="aboutContent" class="sidebar-section">
+            <h4>About This Application</h4>
+            <p>
+                This Health Checkup Application is designed to help manage patient vital details,
+                track their health status (Normal/Abnormal for Temperature, BP, Sugar, BMI),
+                and provide a summary visualization of overall patient health.
+            </p>
+            <p>
+                Features include: Patient data entry, record viewing, editing, single/bulk deletion,
+                CSV data upload, and a health status summary chart.
+            </p>
+            <p>
+                <strong>Version:</strong> 1.0.0<br>
+                <strong>Developed by:</strong> Your Name/Organization
+            </p>
+        </div>
+
+        {# Account Section #}
+        <div id="accountContent" class="sidebar-section" style="display: none;"> {# Hidden by default #}
+            <h4>Account Details</h4>
+            <p>
+                <strong>Logged in as:</strong> {{ username if username else 'Guest' }}
+            </p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{{ url_for('logout') }}" class="logout-btn">🚪 Logout</a>
+            </div>
+        </div>
+    </div>
+</div>

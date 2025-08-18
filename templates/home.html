@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Health Check App</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rowdies:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ecf0f3;
+    min-height: 100vh;
+    color: #f1eeee;
+}
+
+    .container {
+      width:100%;
+      display: flex;
+      flex-direction: column;
+      
+      align-items: center;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background: rgba(236, 240, 243, 0.5);
+      box-shadow: 6px 6px 10px #d1d9e6,
+                        -6px -6px 10px rgba(226, 226, 227, 0.5),
+                        inset 1px 1px 1px #d1d9e6,
+                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+
+      color: #000000;
+      border-radius: 20px;
+      padding: 20px;
+      width: 96%;
+      margin-bottom: 30px;
+      
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+      transform: skewX(-20deg);
+      animation: shine 3s infinite;
+      border-radius: 20px;
+    }
+
+    @keyframes shine {
+      0% { left: -75%; }
+      100% { left: 125%; }
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-family: rowdies;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+   
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: transparent;
+      font-family: poppins;
+      font-weight: 900;
+      color: #e39333;
+      background: rgba(236, 240, 243, 0.5);
+      box-shadow: 6px 6px 10px #d1d9e6,
+                        -6px -6px 10px rgba(226, 226, 227, 0.5),
+                        inset 1px 1px 1px #d1d9e6,
+                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+    }
+
+    .btn-success {
+      background: linear-gradient(45deg, #00ffab, #92fe9d);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .btn-danger {
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .main-content {
+       background: rgba(236, 240, 243, 0.5);
+      box-shadow: 6px 6px 10px #d1d9e6,
+                        -6px -6px 10px rgba(226, 226, 227, 0.5),
+                        inset 1px 1px 1px #d1d9e6,
+                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+      border-radius: 50px;
+      
+      margin-top: 5%;
+      padding: 30px ;
+      width: 80%;
+      
+      color: #e6e5e5;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .start {
+      background: #3a86d7;
+      color: white;
+      font-weight: 800;
+      font-family: poppins;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .welcome-section {
+      text-align: center;
+      padding: 50px 0;
+    }
+
+    .welcome-title {
+      font-size: 3rem;
+      font-weight: 900;
+      font-family:poppins;
+      color: #134c3d;
+      margin-bottom: 40px;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.3rem;
+      color: #444;
+      width:500px;
+      font-weight: 500;
+      margin-left: 27%;
+      margin-bottom: 50px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 768px) {
+      .nav {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .welcome-title {
+        font-size: 2rem;
+      }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      color: #444;
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6,
+                                -6px -6px 10px rgba(226, 226, 227, 0.5),
+                                inset 1px 1px 1px #d1d9e6,
+                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      animation: slideFade 0.4s ease-out;
+      position: relative;
+    }
+
+    @keyframes slideFade {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #141313;
+    }
+    form{
+      margin-top: 20px;
+    }
+    .modal label {
+      display: block;
+      margin-bottom: 6px;
+      font-family: Poppins;
+      font-weight: 550;
+      color: #444;
+      position: relative;
+      top: auto;
+      left: auto;
+      transform: none;
+      padding: 0;
+    }
+
+    .modal input {
+      width: 100%;
+      height: 40px;
+      padding: 0 15px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      font-family:poppins;
+      border: 1px solid #f4fffa;
+      outline: none;
+      border-radius: 5px;
+      background-color:rgb(255, 255, 255);
+      color: #444;
+    }
+    .close-btn{
+      color: red;
+      font-weight: 800;
+    }
+
+    .modal button {
+      background-color: #126a3f;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      font-family: poppins;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none;
+    }
+
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-contacts-auto-fill-button {
+      display: none !important;
+    }
+
+
+    .toggle-password {
+      position: absolute;
+      top: 210px;
+      right: 40px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .error-msg {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+    .nav {
+      
+        display: flex;
+        gap: 20px;
+    }
+
+    .logo {
+        font-size: 1.5rem; /* Slightly smaller logo for mobile */
+        width: 100%; /* Ensure logo takes full width for centering */
+        justify-content: center; /* Center the logo text and icon */
+    }
+
+    .nav-buttons {
+        width: 30%; /* Make buttons container full width */
+         /* Stack buttons vertically */
+        gap: 10px; /* Reduce gap between stacked buttons */
+    }
+
+    .btn {
+        width: 100%; /* Make each button full width */
+        justify-content: center; /* Center the text and icon within buttons */
+        padding: 12px 15px; /* Adjust button padding for mobile touch targets */
+    }
+
+    .header {
+        padding: 15px; /* Adjust header padding for mobile */
+        margin-bottom: 20px; /* Adjust margin for overall spacing */
+        border-radius: 15px; /* Slightly smaller border-radius for compactness */
+    }
+
+    .main-content {
+        width: 95%; /* Adjust main content width for mobile */
+        padding: 20px; /* Adjust padding inside main content */
+        margin-top: 20px; /* Adjust top margin for spacing from header */
+        border-radius: 30px; /* Adjust border-radius for mobile */
+    }
+
+    .welcome-title {
+        font-size: 2rem; /* Keep existing smaller font size */
+        margin-bottom: 20px; /* Reduce bottom margin for compactness */
+    }
+
+    .welcome-subtitle {
+        font-size: 1rem; /* Smaller font size for subtitle */
+        width: 95%; /* Allow subtitle to take almost full width */
+        margin-left: auto; /* Remove fixed margin-left */
+        margin-right: auto; /* Center the text block */
+        margin-bottom: 30px; /* Adjust bottom margin */
+        line-height: 1.5; /* Adjust line height for readability */
+    }
+
+    .form-actions {
+        margin-top: 20px; /* Adjust margin for consistency */
+    }
+
+    .start {
+        width: 80%; /* Make the "Get Started" button wider */
+        padding: 15px 20px; /* Adjust padding */
+        font-size: .8rem; /* Adjust font size */
+    }
+
+    /* Modal Specific Adjustments */
+    .modal {
+        padding: 20px; /* Adjust modal padding */
+        width: 95%; /* Ensure modal takes more width on small screens */
+    }
+
+    .modal label {
+        font-size: 0.95rem; /* Slightly smaller label font */
+    }
+
+    .modal input {
+        height: 45px; /* Slightly taller input for easier tapping */
+        margin-bottom: 15px; /* Adjust input bottom margin */
+    }
+
+    .toggle-password {
+        /* Adjust position relative to its parent .modal input */
+        top: auto; /* Reset top */
+        bottom: 90px; /* Position from the bottom of the modal, roughly near the input */
+        right: 30px; /* Adjust right position */
+    }
+
+    .close-btn {
+        font-size: 1.5rem; /* Make close button larger for easier tapping */
+        top: 10px;
+        right: 10px;
+    }
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <nav class="nav">
+        <div class="logo">
+          </i> Doc-z
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <div class="welcome-section">
+        <h1 class="welcome-title">Welcome to Health Check App</h1>
+        <p class="welcome-subtitle">
+          Track and monitor patient health records with comprehensive status analysis.<br>
+          Manage temperature, blood pressure, blood sugar, and BMI data efficiently.
+        </p>
+        <div class="form-actions">
+          <button class="start" onclick="openModal()"><i class="fas fa-rocket"></i> Get Started</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2><i class="fa-solid fa-lock"></i> Login</h2>
+      <form method="POST" action="{{ url_for('login') }}">
+        <label>User ID</label>
+        <input type="text" name="userid" required>
+
+        <label>Password</label>
+        <input type="password" name="password" id="passwordInput" required>
+        <span class="toggle-password" onclick="togglePasswordVisibility()">
+          <i class="fas fa-eye" id="toggleIcon"></i>
+        </span>
+
+        {% if error %}
+        <p class="error-msg">{{ error }}</p>
+        {% endif %}
+
+        <button type="submit"><i class="fa-solid fa-lock-open"></i> Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function openModal() {
+      document.getElementById('loginModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('loginModal').style.display = 'none';
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('passwordInput');
+      const toggleIcon = document.getElementById('toggleIcon');
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+      }
+    }
+  </script>
+</body>
+</html>

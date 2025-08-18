@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Records</title>
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts for Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-color: #2d5a2f;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --bg-light: #f0f5f9;
+            --bg-white: #ffffff;
+            --text-dark: #343a40;
+            --text-light: #6c757d;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.075);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #ecf0f3;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .main-header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+            padding: 0 20px;
+            margin: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            z-index: 100;
+            width: calc(100% - 40px);
+            box-sizing: border-box;
+        }
+
+        .main-header-bar h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dash-link {
+            text-decoration: none;
+            padding: 10px 20px;
+            color: white;
+            background: linear-gradient(135deg, #FF7043, #D84315);
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dash-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .card {
+            margin: 120px 20px;
+            border-radius: 12px;
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+            margin-bottom: 25px;
+            padding: 25px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .record-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 900px;
+        }
+
+        .record-table th, .record-table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+        
+        .record-table td {
+            font-weight: 500;
+        }
+
+        .record-table thead {
+            background-color: #d5d3d3;
+        }
+
+        .record-table th {
+            font-family: poppins;
+            font-weight: 700;
+            color: #495057;
+        }
+        
+        .rt-head {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        
+        .lt-head {
+            border-bottom-right-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .record-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+        
+        .record-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .record-table tbody tr:hover {
+            background-color: #eef2f7;
+        }
+
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-normal { background-color: var(--success-color); border-radius: 10px; }
+        .status-abnormal { background-color: var(--danger-color); border-radius: 10px; }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #3a86d7;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 0 5px;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .action-btn.edit { color: #007bff; }
+        .action-btn.history { color: var(--info-color); }
+        .action-btn.vitals { color: var(--primary-color); }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px 0;
+            box-sizing: border-box;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 800px;
+            width: 95%;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+        }
+
+        #editModal .modal-content {
+            text-align: left;
+        }
+        
+        #editModal h3 {
+            text-align: center;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+        }
+        
+        #editPatientForm {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        #editPatientForm .form-group {
+            position: relative;
+        }
+        
+        #editPatientForm label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        #editPatientForm input, #editPatientForm select, #editPatientForm textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        
+        #editPatientForm textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        #editPatientForm .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        #editPatientForm .form-actions {
+            grid-column: 1 / -1;
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            font-family: poppins;
+            font-weight: 600;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+        }
+        
+        .btn-outline {
+            background-color: #D84315;
+        }
+        
+        .btn-success {
+            background-color: #007bff;
+        }
+        
+        /* New vital fields container styles */
+        .vital-fields-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .vital-field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 40px;
+            gap: 10px;
+        }
+        
+        .vital-field-row .remove-vital-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .vital-field-row .remove-vital-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* --- RESPONSIVE STYLES --- */
+        @media (max-width: 768px) {
+            .main-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+                position: relative;
+                width: auto;
+                margin: 10px;
+                padding: 15px;
+                height: auto;
+                text-align: center;
+            }
+
+            .main-header-bar h2 {
+                font-size: 1.5rem;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .dash-link {
+                width: 95%;
+                padding: 10px;
+                font-size: 0.9rem;
+                justify-content: center;
+            }
+
+            .container {
+                margin-top: 30%;
+                padding: 10px;
+            }
+
+            .card {
+                margin: 20px 0;
+                padding: 15px;
+            }
+
+            .record-table th, .record-table td {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .status-pill {
+                padding: 3px 8px;
+                font-size: 0.75rem;
+            }
+
+            .action-btn {
+                font-size: 1rem;
+                margin: 0 3px;
+            }
+
+            #editPatientForm {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 90%;
+            }
+            
+            .vital-field-row {
+                grid-template-columns: 1fr 1fr 35px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header-bar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            .main-header-bar h2 {
+                font-size: 1.3rem;
+            }
+            
+            .dash-link {
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+            
+            .card {
+                margin: 15px 0;
+                padding: 10px;
+            }
+            
+            .record-table th, .record-table td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .status-pill {
+                padding: 2px 6px;
+                font-size: 0.7rem;
+            }
+            
+            .action-btn {
+                font-size: 0.9rem;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="main-header-bar">
+            <h2><i class="fas fa-book-medical"></i> Patient Records</h2>
+            <a href="{{ url_for('dashboard') }}" class="dash-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </header>
+
+        <div class="card table-card">
+            <div class="table-container">
+                <table class="record-table">
+                    <thead>
+                        <tr>
+                            <th class="rt-head">Patient ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Temp (°F)</th>
+                            <th>BP</th>
+                            <th>Sugar</th>
+                            <th>BMI</th>
+                            <th>Other Vitals</th>
+                            <th class="lt-head">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                        <tr id="patient-row-{{ row.id }}"
+                            data-id="{{ row.id }}"
+                            data-name="{{ row.name }}"
+                            data-age="{{ row.age }}"
+                            data-gender="{{ row.gender }}"
+                            data-phone_number="{{ row.phone_number or '' }}"
+                            data-email="{{ row.email or '' }}"
+                            data-temperature="{{ row.temperature }}"
+                            data-bp_systolic="{{ row.bp_systolic }}"
+                            data-bp_diastolic="{{ row.bp_diastolic }}"
+                            data-sugar="{{ row.sugar }}"
+                            data-height="{{ row.height }}"
+                            data-weight="{{ row.weight }}"
+                            data-record_date="{{ row.record_date }}"
+                            data-other_vitals="{{ row.other_vitals or '{}' }}">
+                            <td>{{ row.patient_id }}</td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.age }}</td>
+                            <td>{{ row.gender }}</td>
+                            <td><span class="status-pill {{ 'status-normal' if row.temp_status == 'Normal' else 'status-abnormal' }}">{{ row.temperature }}</span></td>
+                            <td><span class="status-pill {{ 'status-normal' if row.bp_status == 'Normal' else 'status-abnormal' }}">{{ row.bp_systolic }}/{{ row.bp_diastolic }}</span></td>
+                            <td><span class="status-pill {{ 'status-normal' if row.sugar_status == 'Normal' else 'status-abnormal' }}">{{ row.sugar }}</span></td>
+                            <td><span class="status-pill {{ 'status-normal' if row.bmi_status == 'Normal' else 'status-abnormal' }}">{{ row.bmi }}</span></td>
+                            <td>
+                                <button type="button" class="action-btn vitals show-vitals-btn" title="View Other Vitals">
+                                    <i class="fas fa-notes-medical"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" class="action-btn edit" title="Edit" onclick="showEditModal('{{ row.id }}')"><i class="fas fa-pen-to-square"></i></button>
+                                <a href="{{ url_for('patient_history', patient_id=row.patient_id) }}" class="action-btn history" title="History"><i class="fas fa-history"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" style="text-align: center; padding: 30px;">
+                                No records found.
+                                <a href="{{ url_for('patient_entry') }}" >Add a new patient</a> to get started.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal (from original code) -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-user-edit"></i> Edit Patient Record</h3>
+            <form method="post" action="{url_for('edit_patient')}" autocomplete="off" id="editPatientForm">
+                <div>
+                    <div class="form-group">
+                        <label for="edit_name">Name</label>
+                        <input type="text" id="edit_name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_age">Age</label>
+                        <input type="number" id="edit_age" name="age" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_gender">Gender</label>
+                        <select id="edit_gender" name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_phone_number">Phone Number</label>
+                        <input type="tel" id="edit_phone_number" name="phone_number">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_email">Email</label>
+                        <input type="email" id="edit_email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_temp">Temperature (°F)</label>
+                        <input type="number" step="0.1" id="edit_temp" name="temp" required>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label for="edit_bp_sys">Systolic BP</label>
+                        <input type="number" id="edit_bp_sys" name="bp_sys" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_bp_dia">Diastolic BP</label>
+                        <input type="number" id="edit_bp_dia" name="bp_dia" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_sugar">Blood Sugar</label>
+                        <input type="number" id="edit_sugar" name="sugar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_height">Height (cm)</label>
+                        <input type="number" step="0.1" id="edit_height" name="height" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_weight">Weight (kg)</label>
+                        <input type="number" step="0.1" id="edit_weight" name="weight" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_record_date">Record Date</label>
+                        <input type="date" id="edit_record_date" name="record_date" required>
+                    </div>
+                </div>
+                <!-- Other Vitals section with dynamic inputs -->
+                <div class="form-group full-width">
+                    <label>Other Vitals</label>
+                    <div id="vital-fields-container" class="vital-fields-container">
+                        <!-- Dynamic vital fields will be added here -->
+                    </div>
+                    <button type="button" id="add-vital-btn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"><i class="fas fa-plus mr-2"></i>Add another vital</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="hideEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Update Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Vitals Modal -->
+    <div id="otherVitalsModal" class="modal">
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all">
+            <!-- Close Button -->
+            <button id="closeOtherVitalsModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition" aria-label="Close modal">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <h3 class="text-center text-2xl font-bold text-gray-900 mb-4">Other Vitals</h3>
+            <ul id="otherVitalsList" class="list-none p-0 m-0">
+                <!-- Dynamic list items will be added here -->
+            </ul>
+            <p id="noVitalsMessage" class="hidden text-gray-500 text-center">No additional vitals recorded.</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Edit Modal Logic ---
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editPatientForm');
+        const vitalFieldsContainer = document.getElementById('vital-fields-container');
+        const addVitalBtn = document.getElementById('add-vital-btn');
+
+        let vitalCounter = 0;
+
+        function addVitalField(vitalName = '', vitalValue = '') {
+            vitalCounter++;
+            const vitalFieldRow = document.createElement('div');
+            vitalFieldRow.classList.add('vital-field-row');
+            vitalFieldRow.innerHTML = `
+                <input type="text" name="vital_name_${vitalCounter}" placeholder="Vital Name" value="${vitalName}" required>
+                <input type="text" name="vital_value_${vitalCounter}" placeholder="Vital Value" value="${vitalValue}" required>
+                <button type="button" class="remove-vital-btn"><i class="fas fa-minus"></i></button>
+            `;
+            vitalFieldsContainer.appendChild(vitalFieldRow);
+
+            vitalFieldRow.querySelector('.remove-vital-btn').addEventListener('click', () => {
+                vitalFieldRow.remove();
+            });
+        }
+        
+        function showEditModal(recordId) {
+            const row = document.getElementById(`patient-row-${recordId}`);
+            if (!row) return;
+
+            // Clear previous vital fields
+            vitalFieldsContainer.innerHTML = '';
+            vitalCounter = 0;
+
+            document.getElementById('edit_name').value = row.dataset.name;
+            document.getElementById('edit_age').value = row.dataset.age;
+            document.getElementById('edit_gender').value = row.dataset.gender;
+            document.getElementById('edit_phone_number').value = row.dataset.phone_number || '';
+            document.getElementById('edit_email').value = row.dataset.email || '';
+            document.getElementById('edit_temp').value = row.dataset.temperature;
+            document.getElementById('edit_bp_sys').value = row.dataset.bp_systolic;
+            document.getElementById('edit_bp_dia').value = row.dataset.bp_diastolic;
+            document.getElementById('edit_sugar').value = row.dataset.sugar;
+            document.getElementById('edit_height').value = row.dataset.height;
+            document.getElementById('edit_weight').value = row.dataset.weight;
+            document.getElementById('edit_record_date').value = row.dataset.record_date;
+
+            // Populate other vitals from JSON string
+            const otherVitalsJson = row.dataset.other_vitals;
+            try {
+                const otherVitals = JSON.parse(otherVitalsJson);
+                if (Object.keys(otherVitals).length > 0) {
+                    for (const vitalName in otherVitals) {
+                        addVitalField(vitalName, otherVitals[vitalName]);
+                    }
+                } else {
+                    addVitalField();
+                }
+            } catch (e) {
+                console.error("Failed to parse other vitals JSON:", e);
+                addVitalField(); // Fallback to an empty field if parsing fails
+            }
+
+            editForm.action = `/edit/${recordId}`;
+            editModal.style.display = 'flex';
+        }
+
+        function hideEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == editModal) {
+                hideEditModal();
+            }
+        }
+        
+        addVitalBtn.addEventListener('click', () => {
+            addVitalField();
+        });
+
+        // --- New Other Vitals Modal Logic ---
+        const otherVitalsModal = document.getElementById('otherVitalsModal');
+        const otherVitalsList = document.getElementById('otherVitalsList');
+        const noVitalsMessage = document.getElementById('noVitalsMessage');
+        const closeOtherVitalsModalBtn = document.getElementById('closeOtherVitalsModalBtn');
+        const showVitalsBtns = document.querySelectorAll('.show-vitals-btn');
+        
+        function hideOtherVitalsModal() {
+            otherVitalsModal.style.display = 'none';
+        }
+
+        showVitalsBtns.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const row = event.target.closest('tr');
+                const otherVitalsJson = row.dataset.other_vitals;
+                
+                otherVitalsList.innerHTML = ''; // Clear previous list items
+                noVitalsMessage.classList.add('hidden');
+
+                try {
+                    const otherVitals = JSON.parse(otherVitalsJson);
+                    if (Object.keys(otherVitals).length > 0) {
+                        for (const [vitalName, vitalValue] of Object.entries(otherVitals)) {
+                            const listItem = document.createElement('li');
+                            listItem.classList.add('mb-2', 'text-gray-700');
+                            listItem.innerHTML = `<span class="font-semibold text-gray-900">${vitalName}:</span> ${vitalValue}`;
+                            otherVitalsList.appendChild(listItem);
+                        }
+                    } else {
+                        noVitalsMessage.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error("Failed to parse other vitals JSON for display:", e);
+                    noVitalsMessage.classList.remove('hidden');
+                }
+
+                otherVitalsModal.style.display = 'flex';
+            });
+        });
+
+        closeOtherVitalsModalBtn.addEventListener('click', () => {
+            hideOtherVitalsModal();
+        });
+
+        // Close modal when clicking outside of it
+        otherVitalsModal.addEventListener('click', (event) => {
+            if (event.target === otherVitalsModal) {
+                hideOtherVitalsModal();
+            }
+        });
+    </script>
+</body>
+</html>

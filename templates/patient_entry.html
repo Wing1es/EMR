@@ -170,6 +170,25 @@
         .form-group select:focus + .icon {
             color: var(--primary-color);
         }
+.form-group textarea {
+    width: 100%;
+    height: 90px; /* enough for 2 rows */
+    display: flex;
+    align-items: center;  /* vertical center */
+    padding: 31px 15px 18px 45px; /* adjust top padding */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--bg-white);
+    resize: none;
+}
+
+.form-group textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 139, 252, 0.2);
+}
 
         button[type="submit"] {
             grid-column: 1 / -1;
@@ -316,6 +335,11 @@
                         <input type="email" name="email" placeholder="Email Address">
                         <i class="icon fas fa-envelope"></i>
                     </div>
+<div class="form-group">
+    <textarea name="address" rows="3" placeholder="Address"></textarea>
+    <i class="icon fas fa-house"></i>
+</div>
+
                 </div>
 
                 <div class="form-column">
@@ -345,17 +369,6 @@
                         <i class="icon fas fa-weight"></i>
                     </div>
                 </div>
-
-                <div class="form-column">
-                    <div class="add-container">
-                        <h3><i class="fas fa-file-medical"></i>Laboratory Values</h3>
-                        <button type="button" id="add-more-btn" class="add-icon-btn">
-                            <i class="fas fa-plus-circle"></i>
-                        </button>
-                    </div>
-                    <div id="additional-vitals-container">
-                        </div>
-                </div>
                 
                 <div class="form-column">
                     <h3><i class="fas fa-calendar-alt"></i> Record Information</h3>
@@ -366,6 +379,79 @@
                         <input type="hidden" id="recordDateValue" name="record_date">
                         <i class="icon fas fa-calendar-check"></i>
                     </div>
+                </div>
+
+                <!-- NEW: Lifestyle (compact and required fields) -->
+                <div class="form-column">
+                    <h3><i class="fas fa-blender-phone"></i> Lifestyle</h3>
+
+                    <div class="form-group">
+                        <select name="smoking_status" required>
+                            <option value="" disabled selected>Smoking status</option>
+                            <option value="Never">Never</option>
+                            <option value="Occasional1">Occasional</option>
+                            <option value="Former">Former</option>
+                            <option value="Current">Current</option>
+                        </select>
+                        <i class="icon fas fa-smoking"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <select name="alcohol_frequency" required>
+                            <option value="" disabled selected>Alcohol (frequency)</option>
+                            <option value="None">None</option>
+                            <option value="Occasional">Occasional</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Daily">Daily</option>
+                        </select>
+                        <i class="icon fas fa-wine-bottle"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <select name="physical_activity" required>
+                            <option value="" disabled selected>Physical activity (per week)</option>
+                            <option value="None">None</option>
+                            <option value="1-2">1-2 days</option>
+                            <option value="3-4">3-4 days</option>
+                            <option value="5+">5 or more days</option>
+                        </select>
+                        <i class="icon fas fa-dumbbell"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <select name="diet_type" required>
+                            <option value="" disabled selected>Diet type</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Low-sodium">Low-sodium</option>
+                            <option value="Keto">Keto</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <i class="icon fas fa-carrot"></i>
+                    </div>
+
+                </div>
+
+                <!-- NEW: Past History (concise, required - enter 'None' if not applicable) -->
+                <div class="form-column">
+                    <h3><i class="fas fa-notes-medical"></i> Past History</h3>
+
+                    <div class="form-group">
+                        <input type="text" name="chronic_conditions" required placeholder="Chronic conditions (e.g., HTN, DM) — enter 'None' if none">
+                        <i class="icon fas fa-procedures"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="current_medications" required placeholder="Current meds & supplements — enter 'None' if none">
+                        <i class="icon fas fa-pills"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="allergies" required placeholder="Allergies (medication/food) — enter 'None' if none">
+                        <i class="icon fas fa-allergies"></i>
+                    </div>
+
                 </div>
 
                 <button type="submit"><i class="fas fa-save"></i> Save Patient Record</button>

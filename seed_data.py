@@ -1,6 +1,6 @@
 import random
 from datetime import datetime, timedelta
-from app import Patient, db, app, generate_patient_id # Import the new ID generator
+from main import Patient, db, app, generate_patient_id # Import the new ID generator
 
 # --- DATA FOR GENERATION ---
 first_names = [

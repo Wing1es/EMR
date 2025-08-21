@@ -43,6 +43,7 @@
             font-size: 2.5rem;
             opacity: 0;
         }
+        
 
         /* Hero section specific styling for image overlay */
         .hero-section {
@@ -97,15 +98,19 @@
           color: #2d5a2f;
         }
         .hero{
+
           border-radius: 20px;
-          margin: 0 100px ;
-            background: rgba(236, 240, 243, 0.5);
+          margin: 30px 100px ;
+            background: rgba(236, 240, 243);
             box-shadow: 6px 6px 10px #d1d9e6,
                                 -6px -6px 10px rgba(226, 226, 227, 0.5),
         }
         .card{
-            background: rgba(236, 240, 243);
-            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+            background: rgba(236, 240, 243, 0.5);
+            box-shadow: 6px 6px 10px #d1d9e6,
+                                -6px -6px 10px rgba(226, 226, 227, 0.5),
+                                inset 1px 1px 1px #d1d9e6,
+                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
         }
         /* Modal Styles */
         .modal-overlay {
@@ -150,17 +155,17 @@
         }
 
         .modal label {
-            font-weight: 500;
+            font-weight: 700;
             color: #555;
         }
 
         .modal input {
             width: 100%;
+            font-weight: 500;
             background-color: #ffffff;
             border-radius: 0.75rem;
             padding: 0.65rem 1rem;
             border: none;
-            
             transition: all 0.3s ease;
             outline: none;
         }
@@ -169,7 +174,7 @@
         .modal button {
             background-color: #2d5a2f;
             color: white;
-            padding: 0.75rem;
+            padding: 0.55rem;
             border-radius: 0.75rem;
             font-weight: 600;
             border: none;
@@ -191,8 +196,17 @@
             top: 1rem;
             right: 1.5rem;
             font-size: 2rem;
-            color: #aaa;
+            color: #f6ab69;
             cursor: pointer;
+        }
+        header{
+            position: relative;
+        }
+        .icon{
+            position: absolute;
+            left: 10px;
+            top: 10px;
+
         }
         
     </style>
@@ -211,12 +225,12 @@
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <!-- Logo as a simple SVG icon -->
-                <h3 class="text-2xl font-bold text-gray-900 logo"><i class="fa-brands fa-medrt" style="color:teal;"></i> MEDI<span class="q">Q</span></h3>
+                <h3 class="text-2xl font-bold text-gray-900 logo"><i class="fa-brands fa-medrt icon" style="color:teal;"></i> MEDI<span class="q">Q</span></h3>
             </div>
             <!-- Navigation links -->
-            <nav class="hidden md:flex items-center space-x-7">
-                <a href="#about" id="about-us-link" class="text-gray-700 hover:text-green-700 transition duration-200">About Us</a>
-                <a href="javascript:void(0)" onclick="openModal()" class="px-4 py-2 text-white rounded-lg font-semibold transition duration-200 sign" >Sign In</a>
+            <nav class="hidden md:flex items-center space-x-7 nav" >
+                <a href="#about" id="about-us-link" class="text-gray-700 hover:text-green-600 transition duration-200" style="font-family: poppins; font-weight: 600;">About Us</a>
+                <a href="javascript:void(0)" onclick="openModal()" class="px-4 py-2 text-white rounded-lg font-semibold transition duration-200 sign" ><i class="fa-solid fa-fingerprint"></i> Sign In</a>
             </nav>
         </div>
     </header>
@@ -290,44 +304,44 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12">
+    <footer class="bg-gray-600 text-white py-12">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <!-- About Section -->
                 <div>
                     <h3 class="text-lg font-bold mb-4">CliniCare</h3>
-                    <p class="text-gray-400 text-sm">
+                    <p class="text-gray-300 text-sm">
                         Modern EHR solutions for modern healthcare. We're dedicated to improving patient care through technology.
                     </p>
                 </div>
                 <!-- Links Section 1 -->
                 <div>
                     <h3 class="text-lg font-bold mb-4">Product</h3>
-                    <ul>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Features</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Pricing</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Security</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">API</a></li>
+                    <ul >
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Features</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Pricing</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Security</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">API</a></li>
                     </ul>
                 </div>
                 <!-- Links Section 2 -->
                 <div>
                     <h3 class="text-lg font-bold mb-4">Company</h3>
                     <ul>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">About Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Careers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Press</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Contact</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">About Us</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Careers</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Press</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Contact</a></li>
                     </ul>
                 </div>
                 <!-- Links Section 3 -->
                 <div>
                     <h3 class="text-lg font-bold mb-4">Resources</h3>
                     <ul>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Blog</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Help Center</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Support</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Blog</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Help Center</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Support</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white transition duration-200">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>

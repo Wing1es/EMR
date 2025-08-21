@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Records</title>
-    <!-- Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-    <!-- Google Fonts for Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -272,33 +269,6 @@
             background-color: #007bff;
         }
         
-        /* New vital fields container styles */
-        .vital-fields-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .vital-field-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 40px;
-            gap: 10px;
-        }
-        
-        .vital-field-row .remove-vital-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: background-color 0.2s ease;
-        }
-        
-        .vital-field-row .remove-vital-btn:hover {
-            background-color: #c82333;
-        }
-
         /* --- RESPONSIVE STYLES --- */
         @media (max-width: 768px) {
             .main-header-bar {
@@ -359,10 +329,6 @@
             .modal-content {
                 padding: 20px;
                 width: 90%;
-            }
-            
-            .vital-field-row {
-                grid-template-columns: 1fr 1fr 35px;
             }
         }
 
@@ -427,18 +393,19 @@
                             <th>Name</th>
                             <th>Age</th>
                             <th>Gender</th>
+                            <th>Email</th>
                             <th>Temp (°F)</th>
                             <th>BP</th>
                             <th>Sugar</th>
                             <th>BMI</th>
-                            <th>Other Vitals</th>
+                            <th>Allergies</th>
                             <th class="lt-head">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in rows %}
-                        <tr id="patient-row-{{ row.id }}"
-                            data-id="{{ row.id }}"
+                        <tr id="patient-row-{{ row.uhid }}"
+                            data-id="{{ row.uhid }}"
                             data-name="{{ row.name }}"
                             data-age="{{ row.age }}"
                             data-gender="{{ row.gender }}"
@@ -450,31 +417,28 @@
                             data-sugar="{{ row.sugar }}"
                             data-height="{{ row.height }}"
                             data-weight="{{ row.weight }}"
-                            data-record_date="{{ row.record_date }}"
-                            data-other_vitals="{{ row.other_vitals or '{}' }}">
-                            <td>{{ row.patient_id }}</td>
+                            data-record_date="{{ row.record_date }}">
+                            <td>{{ row.uhid }}</td>
                             <td>{{ row.name }}</td>
                             <td>{{ row.age }}</td>
                             <td>{{ row.gender }}</td>
+                            <td>{{ row.email }}</td>
                             <td><span class="status-pill {{ 'status-normal' if row.temp_status == 'Normal' else 'status-abnormal' }}">{{ row.temperature }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.bp_status == 'Normal' else 'status-abnormal' }}">{{ row.bp_systolic }}/{{ row.bp_diastolic }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.sugar_status == 'Normal' else 'status-abnormal' }}">{{ row.sugar }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.bmi_status == 'Normal' else 'status-abnormal' }}">{{ row.bmi }}</span></td>
+                            <td>{{ row. allergies }}</td>
+
                             <td>
-                                <button type="button" class="action-btn vitals show-vitals-btn" title="View Other Vitals">
-                                    <i class="fas fa-notes-medical"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <button type="button" class="action-btn edit" title="Edit" onclick="showEditModal('{{ row.id }}')"><i class="fas fa-pen-to-square"></i></button>
-                                <a href="{{ url_for('patient_history', patient_id=row.patient_id) }}" class="action-btn history" title="History"><i class="fas fa-history"></i></a>
+                                <button type="button" class="action-btn edit" title="Edit" onclick="showEditModal('{{ row.uhid }}')"><i class="fas fa-pen-to-square"></i></button>
+                                <a href="{{ url_for('patient_history',uhid=row.uhid) }}" class="action-btn history" title="History"><i class="fas fa-history"></i></a>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="10" style="text-align: center; padding: 30px;">
+                            <td colspan="9" style="text-align: center; padding: 30px;">
                                 No records found.
-                                <a href="{{ url_for('patient_entry') }}" >Add a new patient</a> to get started.
+                                <a href="{{ url_for('patient_entry') }}" style="color:#3a86d7;">Add a new patient</a> to get started.
                             </td>
                         </tr>
                         {% endfor %}
@@ -485,12 +449,13 @@
         
     </div>
 
-    <!-- Edit Modal (from original code) -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3><i class="fas fa-user-edit"></i> Edit Patient Record</h3>
-            <form method="post" action="{url_for('edit_patient')}" autocomplete="off" id="editPatientForm">
+            <form method="post" action="{{ url_for('edit_patient', record_id='dummy') }}" autocomplete="off" id="editPatientForm">
+
                 <div>
+                    
                     <div class="form-group">
                         <label for="edit_name">Name</label>
                         <input type="text" id="edit_name" name="name" required>
@@ -546,14 +511,6 @@
                         <input type="date" id="edit_record_date" name="record_date" required>
                     </div>
                 </div>
-                <!-- Other Vitals section with dynamic inputs -->
-                <div class="form-group full-width">
-                    <label>Other Vitals</label>
-                    <div id="vital-fields-container" class="vital-fields-container">
-                        <!-- Dynamic vital fields will be added here -->
-                    </div>
-                    <button type="button" id="add-vital-btn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"><i class="fas fa-plus mr-2"></i>Add another vital</button>
-                </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-outline" onclick="hideEditModal()">Cancel</button>
                     <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Update Record</button>
@@ -562,151 +519,50 @@
         </div>
     </div>
 
-    <!-- New Vitals Modal -->
-    <div id="otherVitalsModal" class="modal">
-        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 transform transition-all">
-            <!-- Close Button -->
-            <button id="closeOtherVitalsModalBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition" aria-label="Close modal">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-            <h3 class="text-center text-2xl font-bold text-gray-900 mb-4">Other Vitals</h3>
-            <ul id="otherVitalsList" class="list-none p-0 m-0">
-                <!-- Dynamic list items will be added here -->
-            </ul>
-            <p id="noVitalsMessage" class="hidden text-gray-500 text-center">No additional vitals recorded.</p>
-        </div>
-    </div>
+<script>
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editPatientForm');
 
-    <script>
-        // --- Edit Modal Logic ---
-        const editModal = document.getElementById('editModal');
-        const editForm = document.getElementById('editPatientForm');
-        const vitalFieldsContainer = document.getElementById('vital-fields-container');
-        const addVitalBtn = document.getElementById('add-vital-btn');
+    function showEditModal(recordId) {
+        const row = document.getElementById(`patient-row-${recordId}`);
+        if (!row) return;
 
-        let vitalCounter = 0;
+        // Correctly set the form action URL with the specific patient ID
+        document.getElementById('editPatientForm').action = `/edit/${recordId}`;
 
-        function addVitalField(vitalName = '', vitalValue = '') {
-            vitalCounter++;
-            const vitalFieldRow = document.createElement('div');
-            vitalFieldRow.classList.add('vital-field-row');
-            vitalFieldRow.innerHTML = `
-                <input type="text" name="vital_name_${vitalCounter}" placeholder="Vital Name" value="${vitalName}" required>
-                <input type="text" name="vital_value_${vitalCounter}" placeholder="Vital Value" value="${vitalValue}" required>
-                <button type="button" class="remove-vital-btn"><i class="fas fa-minus"></i></button>
-            `;
-            vitalFieldsContainer.appendChild(vitalFieldRow);
+        // Populate the form fields with the data from the HTML table row.
+        document.getElementById('edit_name').value = row.dataset.name;
+        document.getElementById('edit_age').value = row.dataset.age;
+        document.getElementById('edit_gender').value = row.dataset.gender;
+        document.getElementById('edit_phone_number').value = row.dataset.phone_number || '';
+        document.getElementById('edit_email').value = row.dataset.email || '';
+        document.getElementById('edit_temp').value = row.dataset.temperature;
+        document.getElementById('edit_bp_sys').value = row.dataset.bp_systolic;
+        document.getElementById('edit_bp_dia').value = row.dataset.bp_diastolic;
+        document.getElementById('edit_sugar').value = row.dataset.sugar;
+        document.getElementById('edit_height').value = row.dataset.height;
+        document.getElementById('edit_weight').value = row.dataset.weight;
+        document.getElementById('edit_record_date').value = row.dataset.record_date;
 
-            vitalFieldRow.querySelector('.remove-vital-btn').addEventListener('click', () => {
-                vitalFieldRow.remove();
-            });
+        editModal.style.display = 'flex';
+    }
+
+    function hideEditModal() {
+        editModal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == editModal) {
+            hideEditModal();
         }
-        
-        function showEditModal(recordId) {
-            const row = document.getElementById(`patient-row-${recordId}`);
-            if (!row) return;
+    }
 
-            // Clear previous vital fields
-            vitalFieldsContainer.innerHTML = '';
-            vitalCounter = 0;
+    // --- REMOVE THE PREVIOUS EVENT LISTENER AND USE A STANDARD FORM SUBMISSION ---
+    // The previous code with fetch and event.preventDefault() was preventing
+    // the browser from following the server's redirect.
+    // By simply letting the form submit normally, the page will refresh.
+    // No new JavaScript is needed here. The <form> element will handle the submission and redirect automatically.
+</script>
 
-            document.getElementById('edit_name').value = row.dataset.name;
-            document.getElementById('edit_age').value = row.dataset.age;
-            document.getElementById('edit_gender').value = row.dataset.gender;
-            document.getElementById('edit_phone_number').value = row.dataset.phone_number || '';
-            document.getElementById('edit_email').value = row.dataset.email || '';
-            document.getElementById('edit_temp').value = row.dataset.temperature;
-            document.getElementById('edit_bp_sys').value = row.dataset.bp_systolic;
-            document.getElementById('edit_bp_dia').value = row.dataset.bp_diastolic;
-            document.getElementById('edit_sugar').value = row.dataset.sugar;
-            document.getElementById('edit_height').value = row.dataset.height;
-            document.getElementById('edit_weight').value = row.dataset.weight;
-            document.getElementById('edit_record_date').value = row.dataset.record_date;
-
-            // Populate other vitals from JSON string
-            const otherVitalsJson = row.dataset.other_vitals;
-            try {
-                const otherVitals = JSON.parse(otherVitalsJson);
-                if (Object.keys(otherVitals).length > 0) {
-                    for (const vitalName in otherVitals) {
-                        addVitalField(vitalName, otherVitals[vitalName]);
-                    }
-                } else {
-                    addVitalField();
-                }
-            } catch (e) {
-                console.error("Failed to parse other vitals JSON:", e);
-                addVitalField(); // Fallback to an empty field if parsing fails
-            }
-
-            editForm.action = `/edit/${recordId}`;
-            editModal.style.display = 'flex';
-        }
-
-        function hideEditModal() {
-            editModal.style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == editModal) {
-                hideEditModal();
-            }
-        }
-        
-        addVitalBtn.addEventListener('click', () => {
-            addVitalField();
-        });
-
-        // --- New Other Vitals Modal Logic ---
-        const otherVitalsModal = document.getElementById('otherVitalsModal');
-        const otherVitalsList = document.getElementById('otherVitalsList');
-        const noVitalsMessage = document.getElementById('noVitalsMessage');
-        const closeOtherVitalsModalBtn = document.getElementById('closeOtherVitalsModalBtn');
-        const showVitalsBtns = document.querySelectorAll('.show-vitals-btn');
-        
-        function hideOtherVitalsModal() {
-            otherVitalsModal.style.display = 'none';
-        }
-
-        showVitalsBtns.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const row = event.target.closest('tr');
-                const otherVitalsJson = row.dataset.other_vitals;
-                
-                otherVitalsList.innerHTML = ''; // Clear previous list items
-                noVitalsMessage.classList.add('hidden');
-
-                try {
-                    const otherVitals = JSON.parse(otherVitalsJson);
-                    if (Object.keys(otherVitals).length > 0) {
-                        for (const [vitalName, vitalValue] of Object.entries(otherVitals)) {
-                            const listItem = document.createElement('li');
-                            listItem.classList.add('mb-2', 'text-gray-700');
-                            listItem.innerHTML = `<span class="font-semibold text-gray-900">${vitalName}:</span> ${vitalValue}`;
-                            otherVitalsList.appendChild(listItem);
-                        }
-                    } else {
-                        noVitalsMessage.classList.remove('hidden');
-                    }
-                } catch (e) {
-                    console.error("Failed to parse other vitals JSON for display:", e);
-                    noVitalsMessage.classList.remove('hidden');
-                }
-
-                otherVitalsModal.style.display = 'flex';
-            });
-        });
-
-        closeOtherVitalsModalBtn.addEventListener('click', () => {
-            hideOtherVitalsModal();
-        });
-
-        // Close modal when clicking outside of it
-        otherVitalsModal.addEventListener('click', (event) => {
-            if (event.target === otherVitalsModal) {
-                hideOtherVitalsModal();
-            }
-        });
-    </script>
 </body>
 </html>

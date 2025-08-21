@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 import pytz
 from werkzeug.security import generate_password_hash, check_password_hash
+
 from datetime import datetime, timedelta, time, timezone
 from functools import wraps
 import uuid
@@ -25,6 +26,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = "a_super_secret_and_random_key_for_health_app_sessions"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:rishi@localhost:5432/health_app_db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # --- END DATABASE SETUP ---
@@ -62,33 +64,61 @@ class User(db.Model):
 
 class Patient(db.Model):
     __tablename__ = 'patients'
-    # Corrected `Integer` to `db.Integer` and so on for all columns
     id = db.Column(db.Integer, primary_key=True)
-    patient_id = db.Column(db.String(20), nullable=False, index=True)
-    version = db.Column(db.Integer, nullable=False, default=1)
-    is_active = db.Column(db.Boolean, default=True, nullable=False, index=True)
+    uhid = db.Column(db.String(20), unique=True, nullable=False)
+
+    # Patient Information
     name = db.Column(db.String(255), nullable=False)
     age = db.Column(db.Integer)
     gender = db.Column(db.String(20))
     phone_number = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(255), nullable=True)
+    address = db.Column(db.Text, nullable=True)  # New column for address
+
+    # Vital Signs
     temperature = db.Column(db.Float)
     bp_systolic = db.Column(db.Integer)
     bp_diastolic = db.Column(db.Integer)
     sugar = db.Column(db.Integer)
     height = db.Column(db.Float)
     weight = db.Column(db.Float)
+
+    # Lifestyle
+    smoking_status = db.Column(db.String(50), nullable=True) # New column
+    alcohol_frequency = db.Column(db.String(50), nullable=True) # New column
+    physical_activity = db.Column(db.String(50), nullable=True) # New column
+    diet_type = db.Column(db.String(50), nullable=True) # New column
+
+    # Past History
+    chronic_conditions = db.Column(db.Text, nullable=True) # New column
+    current_medications = db.Column(db.Text, nullable=True) # New column
+    allergies = db.Column(db.Text, nullable=True) # New column
+
+    # Status Fields
     bmi = db.Column(db.Float)
     temp_status = db.Column(db.String(20))
     bp_status = db.Column(db.String(20))
     sugar_status = db.Column(db.String(20))
     bmi_status = db.Column(db.String(20))
-    # Corrected data type to Date for consistency
+
+    # Record Metadata
     record_date = db.Column(db.Date)
-    # Corrected method to datetime.now(timezone.utc)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    other_vitals = db.Column(db.Text, nullable=True)
-    prescriptions = db.relationship('Prescription', backref='patient', lazy=True, cascade="all, delete-orphan")
+
+    # Existing metadata
+    version = db.Column(db.Integer, nullable=False, default=1)
+    is_active = db.Column(db.Boolean, default=True, nullable=False, index=True)
+
+    prescriptions = db.relationship(
+        'Prescription',
+        backref='patient',
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    def __repr__(self):
+        return f"Patient('{self.name}', '{self.uhid}')"
+
 
 class Prescription(db.Model):
     __tablename__ = 'prescriptions'
@@ -183,13 +213,13 @@ class CustomPagination:
                 last = num
 
 # --- HELPER FUNCTIONS ---
-def generate_patient_id():
+def generate_uhid():
     year = datetime.now().year
     prefix = f"HC{year}-"
-    last_patient = Patient.query.filter(Patient.patient_id.startswith(prefix)).order_by(Patient.patient_id.desc()).first()
+    last_patient = Patient.query.filter(Patient.uhid.startswith(prefix)).order_by(Patient.uhid.desc()).first()
     if last_patient:
         try:
-            last_seq = int(last_patient.patient_id.split('-')[1])
+            last_seq = int(last_patient.uhid.split('-')[1])
             new_seq = last_seq + 1
         except (ValueError, IndexError):
             new_seq = 1
@@ -316,25 +346,50 @@ def logout():
     return redirect(url_for("login"))
 
 # --- DASHBOARD ROUTE ---
-@app.route("/dashboard")
+# Assuming this is part of your main.py
+@app.route('/dashboard')
 @login_required
 def dashboard():
-    total_patients = Patient.query.distinct(Patient.patient_id).count()
-    abnormal_vitals_count = Patient.query.filter(
-        Patient.is_active == True,
-        (Patient.temp_status == 'Abnormal') |
-        (Patient.bp_status == 'Abnormal') |
-        (Patient.sugar_status == 'Abnormal') |
-        (Patient.bmi_status == 'Abnormal')
-    ).count()
-    dashboard_stats = {
-        "total_patients": total_patients,
-        "abnormal_vitals_count": abnormal_vitals_count
-    }
-    return render_template("dashboard.html",
-                           username=session.get("username"),
-                           user_role=session.get("role"),
-                           stats=dashboard_stats)
+    """
+    Displays the user dashboard with key statistics.
+    """
+    try:
+        # Fetch the total count of distinct patients.
+        total_patients_uhids = db.session.query(Patient.uhid).distinct().count()
+
+        # Count total active patients.
+        total_active_patients = Patient.query.filter_by(is_active=True).distinct(Patient.uhid).count()
+        
+        # Count total prescriptions.
+        total_prescriptions = Prescription.query.count()
+
+        # Count patients with at least one abnormal vital sign.
+        abnormal_vitals_count = Patient.query.filter(
+            Patient.is_active == True,
+            (Patient.temp_status == 'Abnormal') |
+            (Patient.bp_status == 'Abnormal') |
+            (Patient.sugar_status == 'Abnormal') |
+            (Patient.bmi_status == 'Abnormal')
+        ).distinct(Patient.uhid).count()
+
+        # --- FIX: Group all stats into a dictionary named 'stats' ---
+        stats = {
+            'total_patients': total_patients_uhids,
+            'total_active_patients': total_active_patients,
+            'total_prescriptions': total_prescriptions,
+            'abnormal_vitals_count': abnormal_vitals_count
+        }
+
+        # --- FIX: Pass the 'stats' dictionary to the template ---
+        return render_template('dashboard.html', stats=stats)
+
+    except Exception as e:
+        # Log the error for debugging
+        app.logger.error(f"Error in dashboard: {e}")
+        flash("An error occurred while loading the dashboard. Please try again later.", "error")
+        return redirect(url_for("records"))
+
+
 
 # --- AI DETECTOR ROUTE ---
 @app.route('/detect', methods=['POST'])
@@ -408,18 +463,23 @@ def detect_conditions():
         log_audit_event('AI_ANALYSIS_FAILED', f"AI analysis failed: {e}")
         return jsonify({'error': f'The AI model could not be reached. Please check the API key and server logs.'}), 500
 
-# --- PATIENT MANAGEMENT ROUTES ---
 @app.route("/patient_entry", methods=["GET", "POST"])
 @login_required
 def patient_entry():
     if request.method == "POST":
         try:
-            new_patient_id = generate_patient_id()
+            # ✅ UHID is already generated in GET, also confirm here before saving
+            new_uhid = request.form.get("uhid")
+
+            # Patient Information
             name = request.form["name"].strip()
             age = safe_convert(request.form.get("age", ""), int, "Age")
             gender = request.form["gender"].strip()
             phone_number = request.form.get('phone_number', '').strip()
             email = request.form.get('email', '').strip()
+            address = request.form.get('address', '').strip() # New field
+
+            # Vital Signs
             temp = safe_convert(request.form.get("temp", ""), float, "Temperature")
             bp_sys = safe_convert(request.form.get("bp_sys", ""), int, "Systolic BP")
             bp_dia = safe_convert(request.form.get("bp_dia", ""), int, "Diastolic BP")
@@ -427,60 +487,121 @@ def patient_entry():
             height = safe_convert(request.form.get("height", ""), float, "Height")
             weight = safe_convert(request.form.get("weight", ""), float, "Weight")
             record_date = request.form["record_date"]
-            
-            other_vitals_json = parse_other_vitals(request.form)
 
-            if not name: raise ValueError("Name cannot be empty.")
-            if not gender: raise ValueError("Gender cannot be empty.")
-            
-            # This is now handled in the Patient model
+            # Lifestyle fields (New)
+            smoking_status = request.form.get('smoking_status', '').strip()
+            alcohol_frequency = request.form.get('alcohol_frequency', '').strip()
+            physical_activity = request.form.get('physical_activity', '').strip()
+            diet_type = request.form.get('diet_type', '').strip()
+
+            # Past History fields (New)
+            chronic_conditions = request.form.get('chronic_conditions', '').strip()
+            current_medications = request.form.get('current_medications', '').strip()
+            allergies = request.form.get('allergies', '').strip()
+
+            if not name:
+                raise ValueError("Name cannot be empty.")
+            if not gender:
+                raise ValueError("Gender cannot be empty.")
+
             record_date_dt = datetime.strptime(record_date, '%Y-%m-%d').date()
 
             bmi = round(weight / ((height / 100) ** 2), 2) if height and weight and height > 0 else 0
             temp_status, bp_status, sugar_status, bmi_status = get_status(temp, bp_sys, bp_dia, sugar, bmi)
 
             new_patient = Patient(
-                patient_id=new_patient_id, name=name, age=age, gender=gender, phone_number=phone_number, email=email,
-                temperature=temp, bp_systolic=bp_sys, bp_diastolic=bp_dia, sugar=sugar, height=height, weight=weight, bmi=bmi,
-                temp_status=temp_status, bp_status=bp_status, sugar_status=sugar_status, bmi_status=bmi_status,
-                record_date=record_date_dt, version=1, is_active=True, other_vitals=other_vitals_json
+                uhid=new_uhid,  # ✅ Save UHID
+                name=name,
+                age=age,
+                gender=gender,
+                phone_number=phone_number,
+                email=email,
+                address=address, # Added new address field
+                temperature=temp,
+                bp_systolic=bp_sys,
+                bp_diastolic=bp_dia,
+                sugar=sugar,
+                height=height,
+                weight=weight,
+                smoking_status=smoking_status, # Added new lifestyle fields
+                alcohol_frequency=alcohol_frequency,
+                physical_activity=physical_activity,
+                diet_type=diet_type,
+                chronic_conditions=chronic_conditions, # Added new past history fields
+                current_medications=current_medications,
+                allergies=allergies,
+                bmi=bmi,
+                temp_status=temp_status,
+                bp_status=bp_status,
+                sugar_status=sugar_status,
+                bmi_status=bmi_status,
+                record_date=record_date_dt,
+                version=1,
+                is_active=True,
+                # Removed 'other_vitals' as it's not in the new model
             )
             db.session.add(new_patient)
             db.session.commit()
 
-            log_audit_event('PATIENT_CREATED', f"Created new patient record '{new_patient.name}' (ID: {new_patient.patient_id}).")
-            flash("Patient record saved successfully!", "success")
+            log_audit_event('PATIENT_CREATED', f"Created new patient record '{new_patient.name}' (UHID: {new_patient.uhid}).")
+            flash(f"Patient record saved successfully! UHID: {new_patient.uhid}", "success")
             return redirect(url_for("records"))
+
         except (ValueError, Exception) as e:
             db.session.rollback()
             flash(str(e), "error")
-    return render_template("patient_entry.html")
+
+    else:
+        # ✅ Generate next UHID in GET request
+        last_patient = Patient.query.order_by(Patient.id.desc()).first()
+        if last_patient and last_patient.uhid:
+            last_number = int(last_patient.uhid.replace("UH", ""))
+            new_number = last_number + 1
+        else:
+            new_number = 1
+        new_uhid = f"UH{new_number:04d}"  # UH0001, UH0002, ...
+
+        return render_template("patient_entry.html", uhid=new_uhid)
+
+
+
 
 @app.route("/records")
 @login_required
 def records():
     query = Patient.query.filter_by(is_active=True)
-    rows = query.order_by(Patient.patient_id.asc()).all()
+    rows = query.order_by(Patient.uhid.asc()).all()
+
     log_audit_event('VIEW_RECORDS', "Viewed active patient records.")
     return render_template("records.html", rows=rows)
 
-@app.route("/edit/<int:record_id>", methods=["GET", "POST"])
+# The Flask route to handle patient record editing.
+# This function handles both showing the form (GET) and processing the update (POST).
+@app.route("/edit/<string:record_id>", methods=["GET", "POST"])
 @login_required
 def edit_patient(record_id):
     """
     Handles the editing of an existing patient record.
     If the request method is POST, a new version of the record is created.
     """
-    old_record = db.session.get(Patient, record_id)
+    old_record = db.session.query(Patient).filter_by(uhid=record_id, is_active=True).first()
     if not old_record:
+        # Flash an error and redirect if the record doesn't exist.
         flash("Original record not found.", "error")
         return redirect(url_for('records'))
 
     if request.method == "POST":
         try:
+            # Capture the current state of the record before changes for auditing.
             changed_from = {col.name: getattr(old_record, col.name) for col in old_record.__table__.columns if not col.name.startswith('_')}
+            
+            # Deactivate the old record to maintain a history.
             old_record.is_active = False
+            
+            # Determine the new version number.
             new_version = old_record.version + 1
+            
+            # Get data from the form.
             name = request.form["name"].strip()
             age = safe_convert(request.form.get("age", ""), int, "Age")
             gender = request.form["gender"].strip()
@@ -493,15 +614,19 @@ def edit_patient(record_id):
             height = safe_convert(request.form.get("height", ""), float, "Height")
             weight = safe_convert(request.form.get("weight", ""), float, "Weight")
             
+            # Convert date string to a date object.
             record_date_str = request.form["record_date"]
             record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date()
-
-            other_vitals_json = parse_other_vitals(request.form)
+            
+            # Calculate BMI.
             bmi = round(weight / ((height / 100) ** 2), 2) if height and weight and height > 0 else 0
+            
+            # Get status for each vital sign based on a separate function (assumed to exist).
             temp_status, bp_status, sugar_status, bmi_status = get_status(temp, bp_sys, bp_dia, sugar, bmi)
 
+            # Create a new patient record with the updated data.
             new_record = Patient(
-                patient_id=old_record.patient_id,
+                uhid=old_record.uhid,
                 version=new_version,
                 is_active=True,
                 name=name, age=age, gender=gender, phone_number=phone_number, email=email,
@@ -509,37 +634,44 @@ def edit_patient(record_id):
                 bp_diastolic=bp_dia, sugar=sugar, height=height, weight=weight, bmi=bmi,
                 temp_status=temp_status, bp_status=bp_status, sugar_status=sugar_status,
                 bmi_status=bmi_status, record_date=record_date,
-                other_vitals=other_vitals_json
+                other_vitals=json.dumps({})  # Set other_vitals to an empty JSON object
             )
             
+            # Add the new record to the session and commit.
             db.session.add(new_record)
             db.session.commit()
 
+            # --- Audit Trail Logging (Optional but good practice) ---
             changed_to = {col.name: getattr(new_record, col.name) for col in new_record.__table__.columns if not col.name.startswith('_')}
             final_from = {k: str(v) for k, v in changed_from.items() if k in changed_to and str(changed_to[k]) != str(v)}
             final_to = {k: str(v) for k, v in changed_to.items() if k in changed_from and str(changed_from[k]) != str(v)}
-
-            log_audit_event('PATIENT_UPDATED', f"Updated record for patient ID {old_record.patient_id}. New version: {new_version}.", final_from, final_to)
+            log_audit_event('PATIENT_UPDATED', f"Updated record for patient UHID {old_record.uhid}. New version: {new_version}.", final_from, final_to)
+            # ----------------------------------------------------
             
+            # Flash success message and redirect.
             flash("Patient record updated successfully! A new version has been created.", "success")
             return redirect(url_for('records'))
         
         except (ValueError, Exception) as e:
+            # Rollback on error and flash a message.
             db.session.rollback()
             flash(f"Error updating record: {e}", "error")
             return redirect(url_for('records'))
 
-    other_vitals_data = json.loads(old_record.other_vitals) if old_record.other_vitals else {}
-    return render_template("edit.html", patient=old_record, other_vitals_data=other_vitals_data)
+    elif request.method == "GET":
+        # Handle the GET request to display the edit form.
+        # This is where the template is rendered with the patient data.
+        other_vitals_data = json.loads(old_record.other_vitals) if old_record.other_vitals else {}
+        return render_template("edit.html", patient=old_record, other_vitals_data=other_vitals_data)
 
-@app.route("/history/<string:patient_id>")
+@app.route("/history/<string:uhid>")
 @login_required
-def patient_history(patient_id):
-    history = Patient.query.filter_by(patient_id=patient_id).order_by(Patient.version.desc()).all()
+def patient_history(uhid):
+    history = Patient.query.filter_by(uhid=uhid).order_by(Patient.version.desc()).all()
     if not history:
         flash("No history found for this patient.", "error")
         return redirect(url_for('records'))
-    log_audit_event('VIEW_HISTORY', f"Viewed history for patient ID {patient_id}.")
+    log_audit_event('VIEW_HISTORY', f"Viewed history for patient ID {uhid}.")
     
     for record in history:
         record.other_vitals_parsed = json.loads(record.other_vitals) if record.other_vitals else {}
@@ -572,7 +704,7 @@ def upload_patient_data():
                 errors = []
                 for row_num, row in enumerate(csv_reader, start=2):
                     try:
-                        new_patient_id = generate_patient_id()
+                        new_uhid = generate_uhid()
                         name = row['name'].strip()
                         age = safe_convert(row.get('age', ''), int, "Age")
                         gender = row['gender'].strip()
@@ -604,7 +736,7 @@ def upload_patient_data():
                                 raise ValueError("Other vitals must be a valid JSON string.")
 
                         new_patient = Patient(
-                            patient_id=new_patient_id, name=name, age=age, gender=gender, phone_number=phone_number, email=email,
+                            uhid=new_uhid, name=name, age=age, gender=gender, phone_number=phone_number, email=email,
                             temperature=temp, bp_systolic=bp_sys, bp_diastolic=bp_dia, sugar=sugar, height=height, weight=weight, bmi=bmi,
                             temp_status=temp_status, bp_status=bp_status, sugar_status=sugar_status, bmi_status=bmi_status,
                             record_date=record_date, version=1, is_active=True, other_vitals=other_vitals_str
@@ -897,10 +1029,10 @@ def view_reminders():
 def set_reminder():
     if request.method == "POST":
         try:
-            patient_id = request.form.get('patient_id')
+            uhid = request.form.get('uhid')
             reminder_type = request.form.get('reminder_type')
 
-            patient = db.session.get(Patient, int(patient_id))
+            patient = db.session.get(Patient, int(uhid))
             if not patient: raise ValueError("Selected patient not found.")
 
             if reminder_type == 'Medication':
@@ -920,7 +1052,7 @@ def set_reminder():
                 start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
                 
                 new_prescription = Prescription(
-                    patient_id=patient.id, reminder_type='Medication',
+                    uhid=patient.id, reminder_type='Medication',
                     doctor_name=doctor_name, medication_name=medication,
                     frequency=frequency, duration=duration,
                     special_note=special_note, start_date=start_date
@@ -962,7 +1094,7 @@ def set_reminder():
                 follow_up_datetime = datetime.combine(follow_up_date, follow_up_time)
 
                 new_prescription = Prescription(
-                    patient_id=patient.id, reminder_type='Follow-up',
+                    uhid=patient.id, reminder_type='Follow-up',
                     medication_name="Follow-up Appointment",
                     special_note=special_note, follow_up_datetime=follow_up_datetime
                 )
@@ -982,7 +1114,7 @@ def set_reminder():
                     raise ValueError("Please provide a title for the 'Other' reminder.")
 
                 new_prescription = Prescription(
-                    patient_id=patient.id,
+                    uhid=patient.id,
                     reminder_type='Other',
                     medication_name=title,
                     special_note=special_note
@@ -999,8 +1131,8 @@ def set_reminder():
             flash(f"Error setting reminder: {e}", "error")
 
     patients = Patient.query.filter(Patient.is_active==True).order_by(Patient.name).all()
-    preselected_patient_id = request.args.get('patient_id', type=int)
-    return render_template("set_reminder.html", patients=patients, preselected_patient_id=preselected_patient_id)
+    preselected_uhid = request.args.get('uhid', type=int)
+    return render_template("set_reminder.html", patients=patients, preselected_uhid=preselected_uhid)
 
 # --- INITIALIZATION ---
 if __name__ == "__main__":

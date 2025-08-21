@@ -389,7 +389,7 @@
                 </ul>
                 {% endif %}
                 <div class="card-footer">
-                    <a href="{{ url_for('set_reminder', patient_id=prescription.patient.id) }}" class="btn btn-info"><i class="fas fa-plus"></i> Add Another Reminder</a>
+                    <a href="{{ url_for('set_reminder', uhid=prescription.patient.id) }}" class="btn btn-info"><i class="fas fa-plus"></i> Add Another Reminder</a>
                     {% if prescription.reminder_type == 'Medication' %}
                     <button class="btn btn-outline" onclick="toggleSchedule('schedule-{{ prescription.id }}', this)">
                         <i class="fas fa-eye"></i> View Schedule

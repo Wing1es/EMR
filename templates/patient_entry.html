@@ -110,14 +110,26 @@
         }
 
         form {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display:flex;
+            flex-direction: column;
             gap: 30px;
         }
+        .row{
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .row1{
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
 
         .form-column {
             background-color: var(--bg-light);
             padding: 20px;
+            width: 100%;
             border-radius: 15px;
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
         }
@@ -302,75 +314,25 @@
 <body>
     <header class="main-header-bar">
         <h2><i class="fas fa-file-medical"></i> Patient Registration</h2>
-        <a href="{{ url_for('dashboard') }}" class="dash-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+        <a href="{{ url_for('dashboard') }}" class="dash-link"><i class="fas fa-arrow-left"></i> Home</a>
     </header>
     <div class="main-container">
         <div class="form-content">
+            
             <h2 class="form-title">New Patient Vitals Form</h2>
             <form method="post" autocomplete="off">
-                <div class="form-column">
-                    <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+            <div class="row">
+                <div class="row1" style="width: 105%;">
+                <div class="form-column" >
+                    <h3 ><i class="fa-solid fa-id-card"></i> Unique Patient ID</h3>
+
                     <div class="form-group">
-                        <input type="text" name="name" required placeholder="Full Name">
+                        <input type="text" name="uhid" value="{{uhid}}" required >
                         <i class="icon fas fa-user"></i>
                     </div>
-                    <div class="form-group">
-                        <input type="number" name="age" required placeholder="Age">
-                        <i class="icon fas fa-birthday-cake"></i>
-                    </div>
-                    <div class="form-group">
-                        <select name="gender" required>
-                            <option value="" disabled selected>Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <i class="icon fas fa-venus-mars"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" name="phone_number" placeholder="Mobile Number">
-                        <i class="icon fas fa-phone"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" name="email" placeholder="Email Address">
-                        <i class="icon fas fa-envelope"></i>
-                    </div>
-<div class="form-group">
-    <textarea name="address" rows="3" placeholder="Address"></textarea>
-    <i class="icon fas fa-house"></i>
-</div>
-
                 </div>
 
-                <div class="form-column">
-                    <h3><i class="fas fa-heartbeat"></i> Vital Signs</h3>
-                    <div class="form-group">
-                        <input type="number" step="0.1" name="temp" required placeholder="Temperature (°F)">
-                        <i class="icon fas fa-thermometer-half"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" name="bp_sys" required placeholder="Systolic BP (e.g., 120)">
-                        <i class="icon fas fa-tint"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" name="bp_dia" required placeholder="Diastolic BP (e.g., 80)">
-                        <i class="icon fas fa-tint"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" name="sugar" required placeholder="Blood Sugar (mg/dL)">
-                        <i class="icon fas fa-cookie-bite"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" step="0.1" name="height" required placeholder="Height (cm)">
-                        <i class="icon fas fa-ruler-vertical"></i>
-                    </div>
-                    <div class="form-group">
-                        <input type="number" step="0.1" name="weight" required placeholder="Weight (kg)">
-                        <i class="icon fas fa-weight"></i>
-                    </div>
-                </div>
-                
-                <div class="form-column">
+                    <div class="form-column">
                     <h3><i class="fas fa-calendar-alt"></i> Record Information</h3>
                     <div class="form-group">
                         <!-- This input is for display purposes only -->
@@ -381,7 +343,8 @@
                     </div>
                 </div>
 
-                <!-- NEW: Lifestyle (compact and required fields) -->
+                </div>
+
                 <div class="form-column">
                     <h3><i class="fas fa-blender-phone"></i> Lifestyle</h3>
 
@@ -432,6 +395,75 @@
                     </div>
 
                 </div>
+            </div>
+            <div class="row">
+
+                <div class="form-column">
+                    <h3><i class="fas fa-user-circle"></i> Personal Information</h3>
+                    
+                    <div class="form-group">
+                        <input type="text" name="name" required placeholder="Full Name">
+                        <i class="icon fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="age" required placeholder="Age">
+                        <i class="icon fas fa-birthday-cake"></i>
+                    </div>
+                    <div class="form-group">
+                        <select name="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <i class="icon fas fa-venus-mars"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="phone_number" placeholder="Mobile Number">
+                        <i class="icon fas fa-phone"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email Address">
+                        <i class="icon fas fa-envelope"></i>
+                    </div>
+                    <div class="form-group">
+                        <textarea name="address" rows="3" placeholder="Address"></textarea>
+                        <i class="icon fas fa-house"></i>
+                    </div>
+                </div>
+                                    <div class="form-column">
+                    <h3><i class="fas fa-heartbeat"></i> Vital Signs</h3>
+                    <div class="form-group">
+                        <input type="number" step="0.1" name="temp" required placeholder="Temperature (°F)">
+                        <i class="icon fas fa-thermometer-half"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="bp_sys" required placeholder="Systolic BP (e.g., 120)">
+                        <i class="icon fas fa-tint"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="bp_dia" required placeholder="Diastolic BP (e.g., 80)">
+                        <i class="icon fas fa-tint"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="sugar" required placeholder="Blood Sugar (mg/dL)">
+                        <i class="icon fas fa-cookie-bite"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" step="0.1" name="height" required placeholder="Height (cm)">
+                        <i class="icon fas fa-ruler-vertical"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" step="0.1" name="weight" required placeholder="Weight (kg)">
+                        <i class="icon fas fa-weight"></i>
+                    </div>
+                </div>
+                
+                </div>
+
+               
+                
+
 
                 <!-- NEW: Past History (concise, required - enter 'None' if not applicable) -->
                 <div class="form-column">

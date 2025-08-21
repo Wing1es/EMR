@@ -14,7 +14,7 @@
     <style>
         :root {
             --primary-color: #3a86d7;
-            --secondary-color: #28a745;
+            --secondary-color: #2d5a2f;
             --danger-color: #EF4444;
             --info-color: #6366F1;
             --bg-light: #F3F4F6;
@@ -356,7 +356,7 @@
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
+            background-color:#1c6bbf ;
             color: white;
             /* Adjusted padding to be consistent with new .btn style */
             padding: 10px 20px;
@@ -366,7 +366,11 @@
             font-weight: 700;
             transition: transform .3s ease;
         }
-
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
 
         .btn-secondary {
             background-color: var(--secondary-color);

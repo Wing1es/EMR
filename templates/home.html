@@ -1,482 +1,506 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Health Check App</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ancizar+Sans:ital,wght@0,100..1000;1,100..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Merriweather+Sans:ital,wght@0,300..800;1,300..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rowdies:wght@300;400;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CliniCare EHR</title>
+    <!-- Use Poppins and Rowdies fonts from Google Fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rowdies:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to ensure a nice, clean look */
+        body {
+            font-family: poppins;
+        }
+        
+        /* Preloader styling */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background-color: #ecf0f3;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #ecf0f3;
-    min-height: 100vh;
-    color: #f1eeee;
-}
+        .preloader-pulse {
+            width: 100px;
+            height: 100px;
+            background-color:teal;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 2.5rem;
+            opacity: 0;
+        }
 
-    .container {
-      width:100%;
-      display: flex;
-      flex-direction: column;
-      
-      align-items: center;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .header {
-      background: rgba(236, 240, 243, 0.5);
-      box-shadow: 6px 6px 10px #d1d9e6,
-                        -6px -6px 10px rgba(226, 226, 227, 0.5),
-                        inset 1px 1px 1px #d1d9e6,
-                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
-
-      color: #000000;
-      border-radius: 20px;
-      padding: 20px;
-      width: 96%;
-      margin-bottom: 30px;
-      
-      position: relative;
-      overflow: hidden;
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -75%;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(120deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-      transform: skewX(-20deg);
-      animation: shine 3s infinite;
-      border-radius: 20px;
-    }
-
-    @keyframes shine {
-      0% { left: -75%; }
-      100% { left: 125%; }
-    }
-
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .logo {
-      font-family: rowdies;
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #444;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-   
-
-    .nav-buttons {
-      display: flex;
-      gap: 15px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-      background: transparent;
-      font-family: poppins;
-      font-weight: 900;
-      color: #e39333;
-      background: rgba(236, 240, 243, 0.5);
-      box-shadow: 6px 6px 10px #d1d9e6,
-                        -6px -6px 10px rgba(226, 226, 227, 0.5),
-                        inset 1px 1px 1px #d1d9e6,
-                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
-    }
-
-    .btn-success {
-      background: linear-gradient(45deg, #00ffab, #92fe9d);
-      color: #000;
-      font-weight: bold;
-    }
-
-    .btn-danger {
-      background: linear-gradient(45deg, #ff416c, #ff4b2b);
-      color: white;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    }
-
-    .main-content {
-       background: rgba(236, 240, 243, 0.5);
-      box-shadow: 6px 6px 10px #d1d9e6,
-                        -6px -6px 10px rgba(226, 226, 227, 0.5),
-                        inset 1px 1px 1px #d1d9e6,
-                        inset -1px -1px 1px rgba(224, 241, 254, 0.5);
-      border-radius: 50px;
-      
-      margin-top: 5%;
-      padding: 30px ;
-      width: 80%;
-      
-      color: #e6e5e5;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: center;
-      margin-top: 30px;
-    }
-
-    .start {
-      background: #3a86d7;
-      color: white;
-      font-weight: 800;
-      font-family: poppins;
-      padding: 12px 24px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
-
-    .welcome-section {
-      text-align: center;
-      padding: 50px 0;
-    }
-
-    .welcome-title {
-      font-size: 3rem;
-      font-weight: 900;
-      font-family:poppins;
-      color: #134c3d;
-      margin-bottom: 40px;
-    }
-
-    .welcome-subtitle {
-      font-size: 1.3rem;
-      color: #444;
-      width:500px;
-      font-weight: 500;
-      margin-left: 27%;
-      margin-bottom: 50px;
-      line-height: 1.8;
-    }
-
-    @media (max-width: 768px) {
-      .nav {
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .welcome-title {
-        font-size: 2rem;
-      }
-    }
-
-    /* Modal Styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal {
-      color: #444;
-            background: rgba(236, 240, 243);
+        /* Hero section specific styling for image overlay */
+        .hero-section {
+            background-color: #ecf0f3;
+            position: relative;
+        }
+        .hero-image-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://placehold.co/1200x800/d1d5db/6b7280?text=Modern+Clinic');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-content-container {
+            position: relative;
+            z-index: 10;
+        }
+        .logo{
+          font-family: rowdies;
+        }
+        .q{
+          color: #129330;
+        }
+        .sign{
+          background: linear-gradient(135deg, #FF7043, #D84315);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .sign:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+        .btn1{
+          background-color: #2d5a2f;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn1:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+        .btn2{
+          border:1px solid #2d5a2f;
+          color: #2d5a2f;
+        }
+        .hero{
+          border-radius: 20px;
+          margin: 0 100px ;
+            background: rgba(236, 240, 243, 0.5);
             box-shadow: 6px 6px 10px #d1d9e6,
                                 -6px -6px 10px rgba(226, 226, 227, 0.5),
-                                inset 1px 1px 1px #d1d9e6,
-                                inset -1px -1px 1px rgba(224, 241, 254, 0.5);
-      padding: 30px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 400px;
-      animation: slideFade 0.4s ease-out;
-      position: relative;
-    }
+        }
+        .card{
+            background: rgba(236, 240, 243);
+            box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
-    @keyframes slideFade {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .modal {
+            background-color: #ecf0f3;
+            padding: 3rem 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            
+        }
 
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: #141313;
-    }
-    form{
-      margin-top: 20px;
-    }
-    .modal label {
-      display: block;
-      margin-bottom: 6px;
-      font-family: Poppins;
-      font-weight: 550;
-      color: #444;
-      position: relative;
-      top: auto;
-      left: auto;
-      transform: none;
-      padding: 0;
-    }
+        .modal h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #2d5a2f;
+        }
 
-    .modal input {
-      width: 100%;
-      height: 40px;
-      padding: 0 15px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      font-family:poppins;
-      border: 1px solid #f4fffa;
-      outline: none;
-      border-radius: 5px;
-      background-color:rgb(255, 255, 255);
-      color: #444;
-    }
-    .close-btn{
-      color: red;
-      font-weight: 800;
-    }
+        .modal h2 i {
+            margin-right: 0.5rem;
+        }
 
-    .modal button {
-      background-color: #126a3f;
-      color: white;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      font-family: poppins;
-      border-radius: 8px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    input[type="password"]::-ms-reveal,
-    input[type="password"]::-ms-clear {
-      display: none;
-    }
+        .modal form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
-    input[type="password"]::-webkit-credentials-auto-fill-button,
-    input[type="password"]::-webkit-contacts-auto-fill-button {
-      display: none !important;
-    }
+        .modal label {
+            font-weight: 500;
+            color: #555;
+        }
 
+        .modal input {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 0.65rem 1rem;
+            border: none;
+            
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
 
-    .toggle-password {
-      position: absolute;
-      top: 210px;
-      right: 40px;
-      cursor: pointer;
-      color: #666;
-    }
+        .modal button {
+            background-color: #2d5a2f;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
+        }
 
-    .error-msg {
-      color: red;
-      font-size: 0.9rem;
-      margin-top: -10px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    @media (max-width: 768px) {
-    .nav {
-      
-        display: flex;
-        gap: 20px;
-    }
-
-    .logo {
-        font-size: 1.5rem; /* Slightly smaller logo for mobile */
-        width: 100%; /* Ensure logo takes full width for centering */
-        justify-content: center; /* Center the logo text and icon */
-    }
-
-    .nav-buttons {
-        width: 30%; /* Make buttons container full width */
-         /* Stack buttons vertically */
-        gap: 10px; /* Reduce gap between stacked buttons */
-    }
-
-    .btn {
-        width: 100%; /* Make each button full width */
-        justify-content: center; /* Center the text and icon within buttons */
-        padding: 12px 15px; /* Adjust button padding for mobile touch targets */
-    }
-
-    .header {
-        padding: 15px; /* Adjust header padding for mobile */
-        margin-bottom: 20px; /* Adjust margin for overall spacing */
-        border-radius: 15px; /* Slightly smaller border-radius for compactness */
-    }
-
-    .main-content {
-        width: 95%; /* Adjust main content width for mobile */
-        padding: 20px; /* Adjust padding inside main content */
-        margin-top: 20px; /* Adjust top margin for spacing from header */
-        border-radius: 30px; /* Adjust border-radius for mobile */
-    }
-
-    .welcome-title {
-        font-size: 2rem; /* Keep existing smaller font size */
-        margin-bottom: 20px; /* Reduce bottom margin for compactness */
-    }
-
-    .welcome-subtitle {
-        font-size: 1rem; /* Smaller font size for subtitle */
-        width: 95%; /* Allow subtitle to take almost full width */
-        margin-left: auto; /* Remove fixed margin-left */
-        margin-right: auto; /* Center the text block */
-        margin-bottom: 30px; /* Adjust bottom margin */
-        line-height: 1.5; /* Adjust line height for readability */
-    }
-
-    .form-actions {
-        margin-top: 20px; /* Adjust margin for consistency */
-    }
-
-    .start {
-        width: 80%; /* Make the "Get Started" button wider */
-        padding: 15px 20px; /* Adjust padding */
-        font-size: .8rem; /* Adjust font size */
-    }
-
-    /* Modal Specific Adjustments */
-    .modal {
-        padding: 20px; /* Adjust modal padding */
-        width: 95%; /* Ensure modal takes more width on small screens */
-    }
-
-    .modal label {
-        font-size: 0.95rem; /* Slightly smaller label font */
-    }
-
-    .modal input {
-        height: 45px; /* Slightly taller input for easier tapping */
-        margin-bottom: 15px; /* Adjust input bottom margin */
-    }
-
-    .toggle-password {
-        /* Adjust position relative to its parent .modal input */
-        top: auto; /* Reset top */
-        bottom: 90px; /* Position from the bottom of the modal, roughly near the input */
-        right: 30px; /* Adjust right position */
-    }
-
-    .close-btn {
-        font-size: 1.5rem; /* Make close button larger for easier tapping */
-        top: 10px;
-        right: 10px;
-    }
-}
-  </style>
+        .modal button:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
+        }
+        .modal button:active {
+            
+            transform: translateY(0);
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+        
+    </style>
 </head>
-<body>
-  <div class="container">
-    <header class="header">
-      <nav class="nav">
-        <div class="logo">
-          </i> Doc-z
+<body class="bg-white text-gray-800">
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-pulse">
+            <h3 class="logo"><i class="fa-brands fa-medrt"></i></h3>
         </div>
-        <div class="nav-buttons">
-          <button class="btn btn-primary" onclick="openModal()"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </div>
+    
+    <!-- Header & Navigation -->
+    <header class="bg-white p-4 md:p-6 ">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- Logo as a simple SVG icon -->
+                <h3 class="text-2xl font-bold text-gray-900 logo"><i class="fa-brands fa-medrt" style="color:teal;"></i> MEDI<span class="q">Q</span></h3>
+            </div>
+            <!-- Navigation links -->
+            <nav class="hidden md:flex items-center space-x-7">
+                <a href="#about" id="about-us-link" class="text-gray-700 hover:text-green-700 transition duration-200">About Us</a>
+                <a href="javascript:void(0)" onclick="openModal()" class="px-4 py-2 text-white rounded-lg font-semibold transition duration-200 sign" >Sign In</a>
+            </nav>
         </div>
-      </nav>
     </header>
 
-    <main class="main-content">
-      <div class="welcome-section">
-        <h1 class="welcome-title">Welcome to Health Check App</h1>
-        <p class="welcome-subtitle">
-          Track and monitor patient health records with comprehensive status analysis.<br>
-          Manage temperature, blood pressure, blood sugar, and BMI data efficiently.
-        </p>
-        <div class="form-actions">
-          <button class="start" onclick="openModal()"><i class="fas fa-rocket"></i> Get Started</button>
+    <!-- Hero Section -->
+    <section class="hero-section py-20 md:py-32 hero">
+        <div class="hero-image-overlay"></div>
+        <div class="container mx-auto px-4 hero-content-container">
+            <div class="max-w-3xl text-center mx-auto">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+                    Simplify Your Practice, Elevate Patient Care.
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-600 mb-8">
+                    CliniCare is a modern, secure, and intuitive Electronic Health Record solution designed for clinics of all sizes.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#" class="px-8 py-3 text-white rounded-xl font-semibold transition duration-200 shadow-lg btn1"  onclick="openModal()">Get Started</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </main>
-  </div>
+    </section>
 
-  <!-- LOGIN MODAL -->
-  <div class="modal-overlay" id="loginModal">
-    <div class="modal">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <h2><i class="fa-solid fa-lock"></i> Login</h2>
-      <form method="POST" action="{{ url_for('login') }}">
-        <label>User ID</label>
-        <input type="text" name="userid" required>
+    <!-- Features Section -->
+    <section class="py-20 " id="about">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Key Features</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    A suite of tools to streamline your workflow and improve patient outcomes.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature Card 1: Secure Data -->
+                <div class="rounded-xl p-8 shadow-md border border-gray-200 card cursor-pointer">
+                    <div class="icon-container flex justify-center items-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-4 mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center text-gray-900 mb-2">Secure & Compliant</h3>
+                    <p class="text-gray-600 text-center">
+                        Protect patient information with enterprise-grade security and HIPAA-compliant data handling.
+                    </p>
+                </div>
+                <!-- Feature Card 2: Efficient Workflow -->
+                <div class="rounded-xl p-8 shadow-md border border-gray-200 card cursor-pointer">
+                    <div class="icon-container flex justify-center items-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-4 mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center text-gray-900 mb-2">Intuitive & Efficient</h3>
+                    <p class="text-gray-600 text-center">
+                        Streamline your daily tasks with a user-friendly interface that reduces administrative burden.
+                    </p>
+                </div>
+                <!-- Feature Card 3: Anywhere Access -->
+                <div class="rounded-xl p-8 shadow-md border border-gray-200 card cursor-pointer">
+                    <div class="icon-container flex justify-center items-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-4 mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-center text-gray-900 mb-2">Anywhere, Anytime</h3>
+                    <p class="text-gray-600 text-center">
+                        Access patient records and manage your practice securely from any device, anywhere.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <label>Password</label>
-        <input type="password" name="password" id="passwordInput" required>
-        <span class="toggle-password" onclick="togglePasswordVisibility()">
-          <i class="fas fa-eye" id="toggleIcon"></i>
-        </span>
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- About Section -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">CliniCare</h3>
+                    <p class="text-gray-400 text-sm">
+                        Modern EHR solutions for modern healthcare. We're dedicated to improving patient care through technology.
+                    </p>
+                </div>
+                <!-- Links Section 1 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Product</h3>
+                    <ul>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Features</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Security</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">API</a></li>
+                    </ul>
+                </div>
+                <!-- Links Section 2 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Company</h3>
+                    <ul>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Contact</a></li>
+                    </ul>
+                </div>
+                <!-- Links Section 3 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Resources</h3>
+                    <ul>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Support</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-200">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center pt-8 border-t border-gray-700">
+                <p class="text-sm text-gray-400">&copy; 2025 CliniCare. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
-        {% if error %}
-        <p class="error-msg">{{ error }}</p>
-        {% endif %}
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2><i class="fa-solid fa-lock"></i> Login</h2>
+            <!-- Note: action and error message are removed as this is a static HTML page -->
+            <form method="POST" action="/login">
+                <label for="userid">User ID</label>
+                <input type="text" id="userid" name="userid" required>
 
-        <button type="submit"><i class="fa-solid fa-lock-open"></i> Login</button>
-      </form>
+                <label for="passwordInput">Password</label>
+                <div class="relative w-full">
+                    <input type="password" id="passwordInput" name="password" required>
+                    <span class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </span>
+                </div>
+                
+                <button type="submit"><i class="fa-solid fa-lock-open"></i> Login</button>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <!-- Scripts -->
-  <script>
-    function openModal() {
-      document.getElementById('loginModal').style.display = 'flex';
-    }
 
-    function closeModal() {
-      document.getElementById('loginModal').style.display = 'none';
-    }
+    <!-- GSAP and ScrollTrigger CDN links -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-    function togglePasswordVisibility() {
-      const passwordInput = document.getElementById('passwordInput');
-      const toggleIcon = document.getElementById('toggleIcon');
+    <script>
+        // Ensure the DOM is fully loaded before running the script
+        document.addEventListener('DOMContentLoaded', () => {
+            const preloader = document.getElementById('preloader');
+            const preloaderPulse = document.querySelector('.preloader-pulse');
+            const aboutUsLink = document.getElementById('about-us-link');
 
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleIcon.classList.remove('fa-eye');
-        toggleIcon.classList.add('fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        toggleIcon.classList.remove('fa-eye-slash');
-        toggleIcon.classList.add('fa-eye');
-      }
-    }
-  </script>
+            // Register GSAP plugins
+            gsap.registerPlugin(ScrollTrigger);
+
+            // New Preloader Animation
+            const preloaderTl = gsap.timeline({ defaults: { ease: "power4.out" } });
+            
+            // First, animate the opacity of the preloader pulse element to 1
+            preloaderTl.to(preloaderPulse, {
+                opacity: 1,
+                duration: 0.5
+            });
+
+            // Then, create a repeating pulse animation by scaling the element
+            preloaderTl.to(preloaderPulse, {
+                scale: 1.1,
+                yoyo: true, // Go back to the starting scale
+                repeat: -1, // Repeat infinitely
+                duration: 1,
+                ease: "power1.inOut"
+            }, "<"); // Start this animation at the same time as the previous one
+
+            // Animate the logo inside the preloader pulse element
+            preloaderTl.fromTo(preloaderPulse.querySelector('.logo'), {
+                opacity: 0,
+                y: 20
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+            
+            // Finally, animate the entire preloader container to fade out
+            preloaderTl.to(preloader, {
+                opacity: 0,
+                duration: 0.5,
+                delay: 1, // Add a delay to let the animation play out
+                onComplete: () => {
+                    preloader.style.display = 'none';
+                }
+            });
+
+            // GSAP ScrollTrigger for feature cards (down to up animation)
+            gsap.fromTo('.card', {
+                y: 50,
+                opacity: 0
+            }, {
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power2.out',
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none',
+                }
+            });
+
+            // GSAP Hover animations for feature cards
+            document.querySelectorAll('.card').forEach(card => {
+                const hoverTimeline = gsap.timeline({ paused: true });
+                hoverTimeline.to(card, {
+                    scale: 1.05,
+                    boxShadow: '0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)',
+                    y: -5,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+                
+                // Event listeners to play and reverse the timeline
+                card.addEventListener('mouseenter', () => hoverTimeline.play());
+                card.addEventListener('mouseleave', () => hoverTimeline.reverse());
+            });
+
+            // Add smooth scroll for the "About Us" link
+            if (aboutUsLink) {
+                aboutUsLink.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const aboutSection = document.getElementById('about');
+                    if (aboutSection) {
+                        aboutSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            }
+
+            // Function to open the login modal
+            function openModal() {
+                gsap.to('#loginModal', {
+                    display: 'flex',
+                    opacity: 1,
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            }
+
+            // Function to close the login modal
+            function closeModal() {
+                gsap.to('#loginModal', {
+                    opacity: 0,
+                    duration: 0.3,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        document.getElementById('loginModal').style.display = 'none';
+                    }
+                });
+            }
+
+            // Function to toggle password visibility
+            function togglePasswordVisibility() {
+                const passwordInput = document.getElementById('passwordInput');
+                const toggleIcon = document.getElementById('toggleIcon');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            }
+
+            // Expose functions to the global scope so they can be called from onclick attributes
+            window.openModal = openModal;
+            window.closeModal = closeModal;
+            window.togglePasswordVisibility = togglePasswordVisibility;
+        });
+    </script>
 </body>
 </html>

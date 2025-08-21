@@ -347,6 +347,7 @@ def logout():
 
 # --- DASHBOARD ROUTE ---
 # Assuming this is part of your main.py
+# --- DASHBOARD ROUTE ---
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -372,7 +373,7 @@ def dashboard():
             (Patient.bmi_status == 'Abnormal')
         ).distinct(Patient.uhid).count()
 
-        # --- FIX: Group all stats into a dictionary named 'stats' ---
+        # Group all stats into a dictionary named 'stats'.
         stats = {
             'total_patients': total_patients_uhids,
             'total_active_patients': total_active_patients,
@@ -380,8 +381,8 @@ def dashboard():
             'abnormal_vitals_count': abnormal_vitals_count
         }
 
-        # --- FIX: Pass the 'stats' dictionary to the template ---
-        return render_template('dashboard.html', stats=stats)
+        # --- FIX: Pass user_role and username to the template ---
+        return render_template('dashboard.html', stats=stats, username=session.get('username'), user_role=session.get('role'))
 
     except Exception as e:
         # Log the error for debugging
@@ -664,17 +665,22 @@ def edit_patient(record_id):
         other_vitals_data = json.loads(old_record.other_vitals) if old_record.other_vitals else {}
         return render_template("edit.html", patient=old_record, other_vitals_data=other_vitals_data)
 
+import json # You might need this for other parts of your app
+
 @app.route("/history/<string:uhid>")
 @login_required
 def patient_history(uhid):
     history = Patient.query.filter_by(uhid=uhid).order_by(Patient.version.desc()).all()
+    
     if not history:
         flash("No history found for this patient.", "error")
         return redirect(url_for('records'))
+    
     log_audit_event('VIEW_HISTORY', f"Viewed history for patient ID {uhid}.")
     
-    for record in history:
-        record.other_vitals_parsed = json.loads(record.other_vitals) if record.other_vitals else {}
+    # The line below has been REMOVED to resolve the AttributeError
+    # for record in history:
+    #     record.other_vitals_parsed = json.loads(record.other_vitals) if record.other_vitals else {}
     
     return render_template("patient_history.html", history=history, patient_name=history[0].name)
 

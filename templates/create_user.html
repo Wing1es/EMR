@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
     <style>
         :root {
             --primary-color: #2d5a2f;
@@ -105,7 +104,6 @@
             cursor: pointer;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             z-index: 150;
-            /* GSAP will handle the animation */
             animation: none;
         }
 
@@ -136,8 +134,6 @@
             box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
             border: 1px solid var(--border-color);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0; /* Animated with GSAP */
-            transform: scale(0.95); /* Animated with GSAP */
         }
         
         /* Updated Hover Effect - just shadow, no color change */
@@ -430,8 +426,8 @@
 
         /* Custom Styles for Delete Modal */
         .delete-modal {
-    text-align: center;
-}
+            text-align: center;
+        }
 
         .delete-modal .modal-title {
             color: #3a86d7;
@@ -447,27 +443,32 @@
 
         .modal-actions {
             display: flex;
-            justify-content: space-around;
-            gap: 15px;
+            justify-content: center; /* Changed from space-around to center */
+            gap: 15px; /* Added gap for consistent spacing */
         }
 
         /* Updated CSS for the 'Delete User' button */
-        .modal-actions .delete-btn-confirm {
-            background: linear-gradient(135deg, #FF7043, #D84315);
-            color: white;
-            border: none;
+        .modal-actions .delete-btn-confirm,
+        .modal-actions .cancel-btn {
+            /* Removed fixed width to allow natural sizing */
             padding: 10px 15px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 45%; /* This ensures the button takes up 45% of the container width */
+            transition: all 0.3s ease; /* Combined transition for smoother effect */
+        }
+        
+        .modal-actions .delete-btn-confirm {
+            background: linear-gradient(135deg, #FF7043, #D84315);
+            color: white;
+            border: none;
         }
 
         .modal-actions .delete-btn-confirm:hover {
-            background-color: #fb9d44;
             transform: translateY(-1px);
+            background-color: #fb9d44;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Added subtle shadow on hover */
         }
 
         /* Updated CSS for the 'Cancel' button */
@@ -475,15 +476,14 @@
             background-color: #f0f0f0;
             color: #333;
             border: 1px solid #ccc;
-            width: 45%; /* This ensures the button takes up 45% of the container width */
-            font-weight: 500;
-            transition: all 0.3s ease;
         }
-
+        
         .modal-actions .cancel-btn:hover {
             background-color: #e0e0e0;
             transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added subtle shadow on hover */
         }
+
 
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
@@ -556,7 +556,7 @@
                 <button class="delete-btn" data-user-id="{{ user.id }}"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
             {% endfor %}
-            </div>
+        </div>
     </div>
 
     <button class="new-user-float-btn" id="open-modal-btn">
@@ -650,28 +650,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            gsap.from('.main-header-bar', { duration: 1, y: -50, opacity: 0, ease: 'power2.out' });
-            gsap.from('.user-management-container h2', { duration: 1, y: 20, opacity: 0, ease: 'power2.out', delay: 0.5 });
-            
-            gsap.fromTo('.user-card', { opacity: 0, y: 50, scale: 0.9 }, { 
-                duration: 0.8,
-                opacity: 1, 
-                y: 0,
-                scale: 1,
-                stagger: 0.15,
-                ease: 'power2.out',
-                delay: 1.2
-            });
-
-            // Floating icon animation
-            gsap.to('.new-user-float-btn', {
-                duration: 2,
-                y: -10,
-                repeat: -1,
-                yoyo: true,
-                ease: 'sine.inOut'
-            });
-
             const modalOverlay = document.getElementById('user-modal');
             const openModalBtn = document.getElementById('open-modal-btn');
             const closeModalBtn = document.getElementById('close-modal-btn');
@@ -707,17 +685,17 @@
                     if (isOpening) {
                         document.querySelectorAll('.select-options.active').forEach(openOptions => {
                             if (openOptions !== optionsContainer) {
-                                gsap.to(openOptions, { duration: 0.3, maxHeight: 0, ease: 'power2.out' });
-                                gsap.to(openOptions.previousElementSibling, { duration: 0.3, rotation: 0 });
+                                openOptions.style.maxHeight = '0px';
+                                openOptions.previousElementSibling.style.transform = 'rotate(0deg)';
                                 openOptions.classList.remove('active');
                             }
                         });
-                        gsap.to(optionsContainer, { duration: 0.4, maxHeight: '200px', ease: 'power2.inOut' });
-                        gsap.to(arrow, { duration: 0.4, rotation: 180 });
+                        optionsContainer.style.maxHeight = '200px';
+                        arrow.style.transform = 'rotate(180deg)';
                         optionsContainer.classList.add('active');
                     } else {
-                        gsap.to(optionsContainer, { duration: 0.3, maxHeight: 0, ease: 'power2.out' });
-                        gsap.to(arrow, { duration: 0.3, rotation: 0 });
+                        optionsContainer.style.maxHeight = '0px';
+                        arrow.style.transform = 'rotate(0deg)';
                         optionsContainer.classList.remove('active');
                     }
                 });
@@ -730,16 +708,16 @@
                         selected.textContent = text;
                         hiddenInput.value = value;
                         
-                        gsap.to(optionsContainer, { duration: 0.3, maxHeight: 0, ease: 'power2.out' });
-                        gsap.to(arrow, { duration: 0.3, rotation: 0 });
+                        optionsContainer.style.maxHeight = '0px';
+                        arrow.style.transform = 'rotate(0deg)';
                         optionsContainer.classList.remove('active');
                     });
                 });
 
                 document.addEventListener('click', (e) => {
                     if (!container.contains(e.target)) {
-                        gsap.to(optionsContainer, { duration: 0.3, maxHeight: 0, ease: 'power2.out' });
-                        gsap.to(arrow, { duration: 0.3, rotation: 0 });
+                        optionsContainer.style.maxHeight = '0px';
+                        arrow.style.transform = 'rotate(0deg)';
                         optionsContainer.classList.remove('active');
                     }
                 });
@@ -770,14 +748,11 @@
 
             deleteButtons.forEach(button => {
                 button.addEventListener('click', (event) => {
-                    // Prevent the default form submission
                     event.preventDefault(); 
                     const userId = button.getAttribute('data-user-id');
                     
-                    // Set the form action dynamically to the correct user ID
                     deleteForm.action = `/delete_user/${userId}`;
                     
-                    // Show the custom confirmation modal
                     confirmDeleteModal.classList.add('active');
                 });
             });

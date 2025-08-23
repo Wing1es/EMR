@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Records</title>
+    <!-- Use Font Awesome for icons and Poppins for the font -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS from CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /*
+        * All custom CSS variables and styles for the app's overall neumorphism design
+        */
         :root {
             --primary-color: #2d5a2f;
             --success-color: #28a745;
@@ -31,12 +36,12 @@
         }
 
         .container {
-            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0px;
             box-sizing: border-box;
         }
-        
+
         .main-header-bar {
             position: fixed;
             top: 0;
@@ -75,7 +80,7 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .dash-link:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
@@ -83,7 +88,8 @@
         }
 
         .card {
-            margin: 120px 20px;
+            margin: 140px 0px;
+            width: 100%;
             border-radius: 12px;
             background: rgba(236, 240, 243);
             box-shadow: 6px 6px 10px #d1d9e6, -6px -6px 10px rgba(226, 226, 227, 0.5), inset 1px 1px 1px #d1d9e6, inset -1px -1px 1px rgba(224, 241, 254, 0.5);
@@ -93,20 +99,41 @@
 
         .table-container {
             overflow-x: auto;
+            width: 100%;
+        }
+
+        /* --- Modern Scrollbar Styles for table --- */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #e0e5ec;
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #a9b9c9;
+            border-radius: 10px;
+            border: 2px solid #e0e5ec;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #8496a7;
         }
 
         .record-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            min-width: 900px;
+            min-width: 1200px;
         }
 
         .record-table th, .record-table td {
             padding: 15px;
             vertical-align: middle;
         }
-        
+
         .record-table td {
             font-weight: 500;
         }
@@ -120,12 +147,12 @@
             font-weight: 700;
             color: #495057;
         }
-        
+
         .rt-head {
             border-top-left-radius: 10px;
             border-bottom-left-radius: 10px;
         }
-        
+
         .lt-head {
             border-bottom-right-radius: 10px;
             border-top-right-radius: 10px;
@@ -135,13 +162,25 @@
             border-bottom: 1px solid var(--border-color);
             transition: background-color 0.2s ease;
         }
-        
+
         .record-table tbody tr:last-child {
             border-bottom: none;
         }
-        
+
         .record-table tbody tr:hover {
             background-color: #eef2f7;
+        }
+
+        .address-icon {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .address-icon:hover {
+            transform: scale(1.2);
+            color: #34495e;
         }
 
         .status-pill {
@@ -152,7 +191,7 @@
             color: white;
             text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
         }
-        
+
         .status-normal { background-color: var(--success-color); border-radius: 10px; }
         .status-abnormal { background-color: var(--danger-color); border-radius: 10px; }
 
@@ -165,12 +204,12 @@
             margin: 0 5px;
             transition: color 0.2s ease, transform 0.2s ease;
         }
-        
+
         .action-btn:hover {
             transform: scale(1.2);
         }
 
-        .action-btn.edit { color: #007bff; }
+        .action-btn.edit { color: #3a86d7; }
         .action-btn.history { color: var(--info-color); }
         .action-btn.vitals { color: var(--primary-color); }
 
@@ -190,7 +229,7 @@
             padding: 20px 0;
             box-sizing: border-box;
         }
-        
+
         .modal-content {
             background: white;
             padding: 30px;
@@ -205,30 +244,30 @@
         #editModal .modal-content {
             text-align: left;
         }
-        
+
         #editModal h3 {
             text-align: center;
             font-size: 1.8rem;
             color: var(--primary-color);
             margin-bottom: 25px;
         }
-        
+
         #editPatientForm {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-        
+
         #editPatientForm .form-group {
             position: relative;
         }
-        
+
         #editPatientForm label {
             display: block;
             font-weight: 500;
             margin-bottom: 5px;
         }
-        
+
         #editPatientForm input, #editPatientForm select, #editPatientForm textarea {
             width: 100%;
             padding: 10px;
@@ -236,22 +275,22 @@
             border-radius: 8px;
             box-sizing: border-box;
         }
-        
+
         #editPatientForm textarea {
             resize: vertical;
             min-height: 100px;
         }
-        
+
         #editPatientForm .full-width {
             grid-column: 1 / -1;
         }
-        
+
         #editPatientForm .form-actions {
             grid-column: 1 / -1;
             text-align: right;
             margin-top: 20px;
         }
-        
+
         .btn {
             font-family: poppins;
             font-weight: 600;
@@ -260,15 +299,62 @@
             border-radius: 10px;
             border: none;
         }
-        
+
         .btn-outline {
             background-color: #D84315;
         }
-        
+
         .btn-success {
-            background-color: #007bff;
+            background-color: #3a86d7;
         }
-        
+
+        /* Address Modal Styles */
+        #addressModal .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        #addressModal h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        #addressContent {
+            white-space: pre-wrap;
+            text-align: left;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        /* --- Updated styles for the edit modal with scrollbar --- */
+        .modal-body {
+            max-height: 70vh; /* Set max height to prevent modal from overflowing screen */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding-right: 15px; /* Add padding to prevent content from touching the scrollbar */
+        }
+
+        /* --- Modern Scrollbar Styles for modal body --- */
+        .modal-body::-webkit-scrollbar {
+            width: 8px; /* Set the width of the vertical scrollbar */
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: #e0e5ec;
+            border-radius: 10px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #a9b9c9;
+            border-radius: 10px;
+            border: 2px solid #e0e5ec;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #8496a7;
+        }
+
         /* --- RESPONSIVE STYLES --- */
         @media (max-width: 768px) {
             .main-header-bar {
@@ -341,38 +427,41 @@
                 margin: 10px;
                 padding: 10px;
             }
-            
+
             .main-header-bar h2 {
                 font-size: 1.3rem;
             }
-            
+
             .dash-link {
                 font-size: 0.75rem;
                 padding: 8px;
             }
-            
+
             .card {
                 margin: 15px 0;
                 padding: 10px;
             }
-            
+
             .record-table th, .record-table td {
                 padding: 6px;
                 font-size: 0.8rem;
             }
-            
+
             .status-pill {
                 padding: 2px 6px;
                 font-size: 0.7rem;
             }
-            
+
             .action-btn {
                 font-size: 0.9rem;
             }
-            
+
             .modal-content {
                 padding: 15px;
             }
+        }
+        .hide{
+            display: none;
         }
     </style>
 </head>
@@ -394,11 +483,18 @@
                             <th>Age</th>
                             <th>Gender</th>
                             <th>Email</th>
+                            <th >Address</th>
                             <th>Temp (°F)</th>
                             <th>BP</th>
                             <th>Sugar</th>
                             <th>BMI</th>
-                            <th>Allergies</th>
+                            <th class="hide">Allergies</th>
+                            <th class="hide">Smoking</th>
+                            <th class="hide">Alcohol</th>
+                            <th class="hide">Activity</th>
+                            <th class="hide">Diet</th>
+                            <th class="hide">Chronic Conditions</th>
+                            <th class="hide">Medications</th>
                             <th class="lt-head">Actions</th>
                         </tr>
                     </thead>
@@ -409,25 +505,41 @@
                             data-name="{{ row.name }}"
                             data-age="{{ row.age }}"
                             data-gender="{{ row.gender }}"
-                            data-phone_number="{{ row.phone_number or '' }}"
+                            data-phone-number="{{ row.phone_number or '' }}"
                             data-email="{{ row.email or '' }}"
+                            data-address="{{ row.address or '' }}"
                             data-temperature="{{ row.temperature }}"
-                            data-bp_systolic="{{ row.bp_systolic }}"
-                            data-bp_diastolic="{{ row.bp_diastolic }}"
+                            data-bp-systolic="{{ row.bp_systolic }}"
+                            data-bp-diastolic="{{ row.bp_diastolic }}"
                             data-sugar="{{ row.sugar }}"
                             data-height="{{ row.height }}"
                             data-weight="{{ row.weight }}"
-                            data-record_date="{{ row.record_date }}">
+                            data-record-date="{{ row.record_date }}"
+                            data-allergies="{{ row.allergies or '' }}"
+                            data-smoking-status="{{ row.smoking_status or '' }}"
+                            data-alcohol-frequency="{{ row.alcohol_frequency or '' }}"
+                            data-physical-activity="{{ row.physical_activity or '' }}"
+                            data-diet-type="{{ row.diet_type or '' }}"
+                            data-chronic-conditions="{{ row.chronic_conditions or '' }}"
+                            data-current-medications="{{ row.current_medications or '' }}"
+                        >
                             <td>{{ row.uhid }}</td>
                             <td>{{ row.name }}</td>
                             <td>{{ row.age }}</td>
                             <td>{{ row.gender }}</td>
                             <td>{{ row.email }}</td>
+                            <td><i class="fas fa-address-card address-icon" title="View Address" onclick="showAddressModal('{{ row.address }}')"></i></td>
                             <td><span class="status-pill {{ 'status-normal' if row.temp_status == 'Normal' else 'status-abnormal' }}">{{ row.temperature }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.bp_status == 'Normal' else 'status-abnormal' }}">{{ row.bp_systolic }}/{{ row.bp_diastolic }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.sugar_status == 'Normal' else 'status-abnormal' }}">{{ row.sugar }}</span></td>
                             <td><span class="status-pill {{ 'status-normal' if row.bmi_status == 'Normal' else 'status-abnormal' }}">{{ row.bmi }}</span></td>
-                            <td>{{ row. allergies }}</td>
+                            <td class="hide">{{ row.allergies or '' }}</td>
+                            <td class="hide">{{ row.smoking_status or '' }}</td>
+                            <td class="hide">{{ row.alcohol_frequency or '' }}</td>
+                            <td class="hide">{{ row.physical_activity or '' }}</td>
+                            <td class="hide">{{ row.diet_type or '' }}</td>
+                            <td class="hide">{{ row.chronic_conditions or '' }}</td>
+                            <td class="hide">{{ row.current_medications or '' }}</td>
 
                             <td>
                                 <button type="button" class="action-btn edit" title="Edit" onclick="showEditModal('{{ row.uhid }}')"><i class="fas fa-pen-to-square"></i></button>
@@ -436,7 +548,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="9" style="text-align: center; padding: 30px;">
+                            <td colspan="18" style="text-align: center; padding: 30px;">
                                 No records found.
                                 <a href="{{ url_for('patient_entry') }}" style="color:#3a86d7;">Add a new patient</a> to get started.
                             </td>
@@ -446,16 +558,25 @@
                 </table>
             </div>
         </div>
-        
+
     </div>
 
+    <!-- Edit Patient Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
-            <h3><i class="fas fa-user-edit"></i> Edit Patient Record</h3>
-            <form method="post" action="{{ url_for('edit_patient', record_id='dummy') }}" autocomplete="off" id="editPatientForm">
+            <h3 style="font-weight: 800;"><i class="fas fa-user-edit"></i> Edit Patient Record</h3>
+            <!-- A new wrapper div for the scrollable content of the form -->
+            <div class="modal-body">
+                <form method="post" action="{{ url_for('edit_patient', record_id='dummy') }}" autocomplete="off" id="editPatientForm">
 
-                <div>
-                    
+                    <div class="full-width">
+                        <div class="form-group">
+                            <label for="edit_uhid" >UHID</label>
+                            <input type="text" id="edit_uhid" name="uhid" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Patient Information -->
                     <div class="form-group">
                         <label for="edit_name">Name</label>
                         <input type="text" id="edit_name" name="name" required>
@@ -480,12 +601,17 @@
                         <label for="edit_email">Email</label>
                         <input type="email" id="edit_email" name="email">
                     </div>
+                    <div class="form-group full-width">
+                        <label for="edit_address">Address</label>
+                        <textarea id="edit_address" name="address"></textarea>
+                    </div>
+
+                    <!-- Vital Signs -->
+                    <h4 class="full-width text-lg font-semibold text-gray-700 mt-4 mb-2">Vital Signs</h4>
                     <div class="form-group">
                         <label for="edit_temp">Temperature (°F)</label>
                         <input type="number" step="0.1" id="edit_temp" name="temp" required>
                     </div>
-                </div>
-                <div>
                     <div class="form-group">
                         <label for="edit_bp_sys">Systolic BP</label>
                         <input type="number" id="edit_bp_sys" name="bp_sys" required>
@@ -506,62 +632,169 @@
                         <label for="edit_weight">Weight (kg)</label>
                         <input type="number" step="0.1" id="edit_weight" name="weight" required>
                     </div>
+
+                    <!-- Lifestyle -->
+                    <h4 class="full-width text-lg font-semibold text-gray-700 mt-4 mb-2">Lifestyle</h4>
                     <div class="form-group">
+                        <label for="edit_smoking_status">Smoking Status</label>
+                        <select id="edit_smoking_status" name="smoking_status">
+                            <option value="">Select...</option>
+                            <option value="Never Smoked">Never Smoked</option>
+                            <option value="Former Smoker">Former Smoker</option>
+                            <option value="Current Smoker">Current Smoker</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_alcohol_frequency">Alcohol Frequency</label>
+                        <select id="edit_alcohol_frequency" name="alcohol_frequency">
+                            <option value="">Select...</option>
+                            <option value="Never">Never</option>
+                            <option value="Socially">Socially</option>
+                            <option value="Daily">Daily</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_physical_activity">Physical Activity</label>
+                        <select id="edit_physical_activity" name="physical_activity">
+                            <option value="">Select...</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Moderately Active">Moderately Active</option>
+                            <option value="Very Active">Very Active</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_diet_type">Diet Type</label>
+                        <select id="edit_diet_type" name="diet_type">
+                            <option value="">Select...</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Pescatarian">Pescatarian</option>
+                            <option value="Omnivore">Omnivore</option>
+                        </select>
+                    </div>
+
+                    <!-- Past History -->
+                    <h4 class="full-width text-lg font-semibold text-gray-700 mt-4 mb-2">Past History</h4>
+                    <div class="form-group full-width">
+                        <label for="edit_chronic_conditions">Chronic Conditions</label>
+                        <textarea id="edit_chronic_conditions" name="chronic_conditions"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="edit_current_medications">Current Medications</label>
+                        <textarea id="edit_current_medications" name="current_medications"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="edit_allergies">Allergies</label>
+                        <textarea id="edit_allergies" name="allergies"></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
                         <label for="edit_record_date">Record Date</label>
                         <input type="date" id="edit_record_date" name="record_date" required>
                     </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline" onclick="hideEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Update Record</button>
-                </div>
-            </form>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="hideEditModal()">Cancel</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Update Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Modal -->
+    <div id="addressModal" class="modal">
+        <div class="modal-content">
+            <h3>Patient Address</h3>
+            <p id="addressContent"></p>
         </div>
     </div>
 
 <script>
+    // Get modal elements
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editPatientForm');
+    const addressModal = document.getElementById('addressModal');
 
+    /**
+     * Shows the edit modal and populates the form fields with patient data.
+     * @param {string} recordId - The UHID of the patient record to edit.
+     */
     function showEditModal(recordId) {
+        // Find the table row using the patient ID
         const row = document.getElementById(`patient-row-${recordId}`);
-        if (!row) return;
+        if (!row) {
+            console.error(`Patient row with ID 'patient-row-${recordId}' not found.`);
+            return;
+        }
 
         // Correctly set the form action URL with the specific patient ID
         document.getElementById('editPatientForm').action = `/edit/${recordId}`;
 
-        // Populate the form fields with the data from the HTML table row.
-        document.getElementById('edit_name').value = row.dataset.name;
-        document.getElementById('edit_age').value = row.dataset.age;
-        document.getElementById('edit_gender').value = row.dataset.gender;
-        document.getElementById('edit_phone_number').value = row.dataset.phone_number || '';
-        document.getElementById('edit_email').value = row.dataset.email || '';
-        document.getElementById('edit_temp').value = row.dataset.temperature;
-        document.getElementById('edit_bp_sys').value = row.dataset.bp_systolic;
-        document.getElementById('edit_bp_dia').value = row.dataset.bp_diastolic;
-        document.getElementById('edit_sugar').value = row.dataset.sugar;
-        document.getElementById('edit_height').value = row.dataset.height;
-        document.getElementById('edit_weight').value = row.dataset.weight;
-        document.getElementById('edit_record_date').value = row.dataset.record_date;
+        // Populate the form fields using data attributes from the table row.
+        // The dataset property automatically converts kebab-case (e.g., data-phone-number)
+        // to camelCase (e.g., dataset.phoneNumber).
+        document.getElementById('edit_uhid').value = row.dataset.id.trim();
+        document.getElementById('edit_name').value = row.dataset.name.trim();
+        document.getElementById('edit_age').value = row.dataset.age.trim();
+        document.getElementById('edit_gender').value = row.dataset.gender.trim();
+        document.getElementById('edit_phone_number').value = row.dataset.phoneNumber.trim();
+        document.getElementById('edit_email').value = row.dataset.email.trim();
+        document.getElementById('edit_address').value = row.dataset.address.trim();
+        document.getElementById('edit_temp').value = row.dataset.temperature.trim();
+        document.getElementById('edit_bp_sys').value = row.dataset.bpSystolic.trim();
+        document.getElementById('edit_bp_dia').value = row.dataset.bpDiastolic.trim();
+        document.getElementById('edit_sugar').value = row.dataset.sugar.trim();
+        document.getElementById('edit_height').value = row.dataset.height.trim();
+        document.getElementById('edit_weight').value = row.dataset.weight.trim();
+        document.getElementById('edit_record_date').value = row.dataset.recordDate.trim();
+        
+        // This is the correct logic for the lifestyle and history fields.
+        // The .trim() method is added for extra robustness against leading/trailing whitespace.
+        document.getElementById('edit_smoking_status').value = row.dataset.smokingStatus.trim();
+        document.getElementById('edit_alcohol_frequency').value = row.dataset.alcoholFrequency.trim();
+        document.getElementById('edit_physical_activity').value = row.dataset.physicalActivity.trim();
+        document.getElementById('edit_diet_type').value = row.dataset.dietType.trim();
+        document.getElementById('edit_chronic_conditions').value = row.dataset.chronicConditions.trim();
+        document.getElementById('edit_current_medications').value = row.dataset.currentMedications.trim();
+        document.getElementById('edit_allergies').value = row.dataset.allergies.trim();
 
+        // Display the modal
         editModal.style.display = 'flex';
     }
 
+    /**
+     * Hides the edit modal.
+     */
     function hideEditModal() {
         editModal.style.display = 'none';
     }
 
+    /**
+     * Shows the address modal with the provided address text.
+     * @param {string} address - The address to display.
+     */
+    function showAddressModal(address) {
+        const addressContent = document.getElementById('addressContent');
+        addressContent.textContent = address;
+        addressModal.style.display = 'flex';
+    }
+
+    /**
+     * Hides the address modal.
+     */
+    function hideAddressModal() {
+        addressModal.style.display = 'none';
+    }
+
+    // Event listener to close modals when clicking outside of them
     window.onclick = function(event) {
         if (event.target == editModal) {
             hideEditModal();
+        } else if (event.target == addressModal) {
+            hideAddressModal();
         }
     }
-
-    // --- REMOVE THE PREVIOUS EVENT LISTENER AND USE A STANDARD FORM SUBMISSION ---
-    // The previous code with fetch and event.preventDefault() was preventing
-    // the browser from following the server's redirect.
-    // By simply letting the form submit normally, the page will refresh.
-    // No new JavaScript is needed here. The <form> element will handle the submission and redirect automatically.
 </script>
 
 </body>

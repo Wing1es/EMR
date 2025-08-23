@@ -1,1 +1,1 @@
- allergies
+current_medications

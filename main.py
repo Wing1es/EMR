@@ -1162,6 +1162,58 @@ def set_reminder():
     preselected_uhid = request.args.get('uhid', type=int)
     return render_template("set_reminder.html", patients=patients, preselected_uhid=preselected_uhid)
 
+# --- CONFIGURATION FOR API KEY ---
+API_KEY = "my_secure_api_key_123"  # You can store in .env later
+
+# --- API ENDPOINT TO FETCH PATIENT DATA BY UHID ---
+@app.route("/api/patient/<string:uhid>", methods=["GET"])
+def get_patient_by_uhid(uhid):
+    """
+    API Endpoint to fetch a patient record by UHID.
+    Supports API key validation via header (X-API-KEY) or query parameter (?api_key=...).
+    """
+    # ✅ Get API Key from header OR query string
+    api_key_header = request.headers.get("X-API-KEY")
+    api_key_query = request.args.get("api_key")
+
+    if api_key_header != API_KEY and api_key_query != API_KEY:
+        return jsonify({"error": "Unauthorized - Invalid or missing API Key"}), 401
+
+    # ✅ Fetch the active patient record
+    patient = Patient.query.filter_by(uhid=uhid, is_active=True).first()
+    if not patient:
+        return jsonify({"error": f"No active patient found with UHID {uhid}"}), 404
+
+    # ✅ Convert patient record into dictionary
+    patient_data = {
+        "uhid": patient.uhid,
+        "name": patient.name,
+        "age": patient.age,
+        "gender": patient.gender,
+        "temperature": patient.temperature,
+        "bp_systolic": patient.bp_systolic,
+        "bp_diastolic": patient.bp_diastolic,
+        "sugar": patient.sugar,
+        "height": patient.height,
+        "weight": patient.weight,
+        "smoking_status": patient.smoking_status,
+        "alcohol_frequency": patient.alcohol_frequency,
+        "physical_activity": patient.physical_activity,
+        "diet_type": patient.diet_type,
+        "chronic_conditions": patient.chronic_conditions,
+        "current_medications": patient.current_medications,
+        "allergies": patient.allergies,
+        "bmi": patient.bmi,
+        "temp_status": patient.temp_status,
+        "bp_status": patient.bp_status,
+        "sugar_status": patient.sugar_status,
+        "bmi_status": patient.bmi_status,
+        "record_date": patient.record_date.isoformat() if patient.record_date else None,
+        "is_active": patient.is_active,
+    }
+
+    return jsonify(patient_data)
+
 # --- INITIALIZATION ---
 if __name__ == "__main__":
     with app.app_context():

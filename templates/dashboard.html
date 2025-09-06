@@ -569,18 +569,7 @@
         <nav class="nav-links">
             <a href="{{ url_for('records') }}">Records</a>
 
-            <div class="dropdown">
-                <a href="#" class="dropdown-link" id="dept-toggle">
-                    Departments <i class="fas fa-chevron-down"></i>
-                </a>
-                <div class="dropdown-content" id="dept-menu">
-                    <a href="#">Orthopedics</a>
-                    <a href="#">Pediatrics</a>
-                    <a href="#">Surgery</a>
-                    <a href="#">Pulmonology</a>
-                    <a href="#">Nephrology</a>
-                </div>
-            </div>
+
 
             {% if not user_role == 'admin' %}
             <a href="{{ url_for('view_reminders') }}">Reminders</a>
